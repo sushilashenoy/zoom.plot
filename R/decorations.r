@@ -49,7 +49,7 @@ prettybp <- function (n, round.digits=2, signif.digits=NULL, space=TRUE) {
 #' labels
 #' @seealso \code{\link{draw.scale}} for drawing a color scale bar
 #' @export
-draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, ...) {
+draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, label.chrom=TRUE, label.scale=TRUE, ...) {
   plot(0, type='n', ylim=c(-1, 1), xlim=c(start.pos, end.pos),
        axes=FALSE, bty='n', xlab='', ylab='', yaxs='i')
   
@@ -59,11 +59,34 @@ draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, ...) {
   plot.height <- par('pin')[2]
   sapply(ticks.at, function (x) { lines(c(x, x), c(-0.1, 0.1)/plot.height)})
   text(ticks.at, rep(0, length(ticks.at)), ticks.at/1e6, pos=1, xpd=NA, ...)
-  text(par('usr')[2], 0, 'Mb', pos=4, xpd=NA, ...)
-  if ( !is.null(chrom) ) {
+  if ( label.scale ) {
+    text(par('usr')[2], 0, 'Mb', pos=4, xpd=NA, ...)
+  }
+  if ( !is.null(chrom) && label.chrom ) {
     text(par('usr')[1], 0, chrom, pos=2, xpd=NA, ...)
   }
 }
+
+
+#' Assign colors to value according to a scale
+#' 
+#' \code{draw.scale} takes a vector of values, a color vector, and a range
+#' vector and returns colors for plotting those values
+#' 
+#' 
+#' @param x values to be plotted
+#' @param scale.colors a vector of colors
+#' @param scale.range range for scale (vector with 2 numeric elements)
+#' @seealso \code{\link{draw.scale}} for drawing a color scale
+#' @export
+assign.scale.colors <- function(x, scale.colors, scale.range) {
+  if ( missing(scale.range) ) scale.range <- range(x)
+  x.scaled <- (x-scale.range[1])/diff(scale.range)
+  color.idx <- 1+floor(x.scaled*(length(scale.colors)-1))
+  color.idx <- pmax(pmin(color.idx, length(scale.colors)), 1)
+  return ( scale.colors[color.idx] )
+}
+
 
 #' Draw a color scale bar
 #' 
