@@ -8,16 +8,60 @@
 # test.mart <- useMart("ENSEMBL_MART_ENSEMBL", host='feb2014.archive.ensembl.org', dataset='hsapiens_gene_ensembl')
 # head(listAttributes(test.mart))
 
-BIOMART_HOST <- 'www.ensembl.org'
-NAME_FIELD <- 'external_gene_name'
-# BIOMART_HOST <- 'feb2014.archive.ensembl.org'
-# NAME_FIELD <- 'external_gene_id'
+BIOMART_OPTIONS <- new.env(parent=emptyenv())
+
+#' @export
+load.gene.mart <- function(version='hg38',
+                           biomart.host,
+                           biomart.fields,
+                           biomart.filters,
+                           biomart.mart,
+                           biomart.dataset) {
+  require('biomaRt')
+  
+  BIOMART_OPTIONS$host <- 'www.ensembl.org'
+  BIOMART_OPTIONS$fields <- c('ensembl_transcript_id',
+                              'external_gene_name',
+                              'transcript_start',
+                              'transcript_end',
+                              'exon_chrom_start',
+                              'exon_chrom_end')
+  BIOMART_OPTIONS$filters <- c("chromosomal_region", 'with_ccds')
+  BIOMART_OPTIONS$mart <- 'ENSEMBL_MART_ENSEMBL'
+  BIOMART_OPTIONS$dataset <- 'hsapiens_gene_ensembl'
+  
+  if (!missing(biomart.host) ) {
+    BIOMART_OPTIONS$host <- biomart.host
+  }
+  if ( !missing(biomart.fields) ) {
+    BIOMART_OPTIONS$fields <- biomart.fields
+  }
+  if ( !missing(biomart.mart) ) {
+    BIOMART_OPTIONS$mart <- biomart.mart
+  }
+  if ( !missing(biomart.dataset) ) {
+    BIOMART_OPTIONS$dataset <- biomart.dataset
+  }
+  
+  if ( version=='hg37' ) {
+    BIOMART_OPTIONS$host <- 'feb2014.archive.ensembl.org'
+    BIOMART_OPTIONS$fields <- c('ensembl_transcript_id',
+                         'external_gene_id',
+                         'transcript_start',
+                         'transcript_end',
+                         'exon_chrom_start',
+                         'exon_chrom_end')
+  } 
+  
+  BIOMART_OPTIONS$ens.mart <- useMart(BIOMART_OPTIONS$mart,
+                                      host=BIOMART_OPTIONS$host,
+                                      dataset=BIOMART_OPTIONS$dataset)
+}
 
 #' @export
 get.regional.genes <- function(chrom, start.pos, end.pos) {
-  if ( !exists('ens.mart') ) {
-    require('biomaRt')
-    ens.mart <<- useMart("ENSEMBL_MART_ENSEMBL", host=BIOMART_HOST, dataset='hsapiens_gene_ensembl')
+  if ( !exists('ens.mart', envir=BIOMART_OPTIONS) ) {
+    load.gene.mart()
   }
   
   # Use biomaRt to get a list of genes in our region
@@ -29,14 +73,9 @@ get.regional.genes <- function(chrom, start.pos, end.pos) {
   bm.range <- paste(chrom, start.pos, end.pos, sep=':')
   
   cat('Finding genes in region:', bm.range, '...\n')
-  bm.exons <- getBM(attributes=c('ensembl_transcript_id',
-                                 NAME_FIELD,
-                                 'transcript_start',
-                                 'transcript_end',
-                                 'exon_chrom_start',
-                                 'exon_chrom_end'),
-                    filters=c("chromosomal_region", 'with_ccds'),
-                    values=list(bm.range, TRUE), mart=ens.mart)
+  bm.exons <- getBM(attributes=BIOMART_OPTIONS$fields,
+                    filters=BIOMART_OPTIONS$filters,
+                    values=list(bm.range, TRUE), mart=BIOMART_OPTIONS$ens.mart)
   
   # Replace long names with shorter ones
   colnames(bm.exons) <- c('tx.id', 'name', 'start', 'end',

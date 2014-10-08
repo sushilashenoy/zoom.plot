@@ -2,6 +2,8 @@
 if ( interactive() ) {
   
   library('zoom.plot')
+  # To use older chromosome coordinates!! Only have to do this once per package load.
+  load.gene.mart('hg37')
   
   # Define colors for manhattan plot
   maf.colors <- c(rgb(20:0/20, 0, 0), rgb(0, 1:20/20, 0))
