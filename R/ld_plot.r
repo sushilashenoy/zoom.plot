@@ -162,13 +162,15 @@ ld.matrix <- function(genotypes, mc.cores) {
 }
 
 #' @export
-ld.plot <- function(ld.matrix, snp.positions, start.pos, end.pos, ld.colors, scale=TRUE) {
+ld.plot <- function(ld.matrix, snp.positions, start.pos, end.pos, ld.colors, drawscale=TRUE, scale.cex=0.6) {
   
   if ( missing(ld.colors) ) {
     ld.colors <- rgb(1, 99:0/99, 99:0/99)
   }
   stopifnot(ncol(ld.matrix)==length(snp.positions),
             nrow(ld.matrix)==length(snp.positions))
+  
+  if ( is.unsorted(snp.positions) ) warning('SNPs positions are not in order!')
   
   plot(0, type='n', ylim=c(min(snp.positions)-max(snp.positions), 0), 
        xlim=range(snp.positions),
@@ -200,7 +202,7 @@ ld.plot <- function(ld.matrix, snp.positions, start.pos, end.pos, ld.colors, sca
     }
   }
   
-  if ( scale ) {
-    draw.scale(ld.colors, c(0, 1), num.labs=6, position='bottomleft', cex=0.6)
+  if ( drawscale ) {
+    draw.scale(ld.colors, c(0, 1), num.labs=6, position='bottomleft', cex=scale.cex)
   }
 }
