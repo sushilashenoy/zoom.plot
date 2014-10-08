@@ -94,7 +94,14 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 #' with specified colors and range
 #' 
 #' 
-#' STUFF
+#' Currently only a horizontal scale bar is supported. To adjust position in
+#' plot coordinates use x.offset and y.offset. To adjust relative position use
+#' x.shift and y.shift.
+#' 
+#' Keep in mind that if you shift the scale bar away from the plotting area
+#' (i.e. into the margins), you may need to specify the additional parameter
+#' xpd=NA which will be passed to the plotting commands and allows drawing
+#' in the margins.
 #' 
 #' @param scale.colors a vector of colors
 #' @param scale.range range for scale (vector with 2 numeric elements)
@@ -105,13 +112,16 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 #' @param width.to.height (optional) ratio of scale bar width to height
 #' @param x.offset (optional) adjust x position (uses \code{par('usr')} scale).
 #' @param y.offset (optional) adjust y position (uses \code{par('usr')} scale).
-#' @param ... (optional) addition options to pass to \code{text} for drawing
-#' labels
+#' @param x.shift (optional) adjust x position relative to scale size.
+#' @param y.shift(optional) adjust y position relative to scale size.
+#' @param ... (optional) addition options to pass to plotting commands for
+#' drawing labels, lines and shapes
+#' 
 #' @seealso \code{\link{draw.chrom.axis}} for drawing x-axis 
 #' @export
 draw.scale <- function(scale.colors, scale.range, num.labs=6,
                        position='topleft', size=3, width.to.height=20,
-                       x.offset=0, y.offset=0, ...) {
+                       x.offset, y.offset, x.shift, y.shift, ...) {
   par.usr <- par('usr')
   par.pin <- par('pin')
   
@@ -131,6 +141,17 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
   } else {
     x2 <- par.usr[2]
     x1 <- par.usr[2] - (par.usr[2]-par.usr[1])/(par.pin[1])*size
+  }
+  
+  if ( missing(x.offset) ) x.offset <- 0
+  if ( missing(y.offset) ) y.offset <- 0
+  
+  if ( !missing(x.shift) ) {
+    x.offset <- x.offset + x.shift*(y2-y1)
+  }
+  
+  if ( !missing(y.shift) ) {
+    y.offset <- y.offset + y.shift*(y2-y1)
   }
   
   y1 <- y1 + y.offset
