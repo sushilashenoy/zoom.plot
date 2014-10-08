@@ -19,42 +19,39 @@ if ( interactive() ) {
   snp.logp <- -log10(runif(100))
   snp.mafs <- runif(100, 0.1, 0.49)
   
+  # Make up a fake LD matrix based on a subset of SNPs
+  ld.mat <- matrix(runif(20*20), 20)
+  ld.coords <- sort(sample(snp.coords, 20))
+  
   # Get colors for SNPs according to maf
   snp.colors <- assign.scale.colors(snp.mafs, maf.colors, c(0, 0.5))
 
-  # Get genes in location
+  # Get genes in region
   test.genes <- get.regional.genes(chrom, start.pos, end.pos)
   
-  # Make a stacked plot with middle portion size of 15% (for axis)
-  fig <- fig.parts(c(NA, 0.15, 0.25))
   
-  fig(2, new=TRUE) # Start a new figure, region 2 (middle)
-  par(mar=c(0, 4, 0, 4))
-  draw.chrom.axis(start.pos, end.pos, paste('chr', chrom))
-  use.xlim <- par('usr')[1:2]
+  # To remake plot with visual adjustments you only need to rerun code below!
+  # ( You do NOT have to look up genes or calculate LD every time! )
   
-  fig(3) # Continue figure, region 3 (bottom)
-  plotgenes(test.genes, highlight.gene='ERAP2')
-  
-  fig(1) # Continue figure, region 1 (top)
-  par(mar=c(0, 4, 3, 4))
-  plot(snp.coords, snp.logp, pch=20, col=snp.colors,
-       xaxt='n', bty='n', xlim=use.xlim, xaxs='i',
-       ylab=expression(-log[10](p)), xlab='')
-  draw.scale(maf.colors, c(0, 0.5), pos='topright', y.offset=0.5, xpd=NA)
+  # Set margins and layout for 4 plots
+  par(mar=c(0, 4, 0, 4), oma=c(2, 1, 2, 0))
+  layout(matrix(1:4, 4), height=c(30, 10, 10, 40))
+#   layout.show(4)
 
-  
-  
-  # Instead of fig.parts you could just use mfcol for equally sized regions:
-  par(mfcol=c(3, 1))
-  par(mar=c(0, 4, 0, 4), oma=c(0, 0, 4, 0))
+  # Manhattan plot
   plot(snp.coords, snp.logp, pch=20, col=snp.colors,
        xaxt='n', bty='n', xlim=c(start.pos, end.pos), xaxs='i',
        ylab=expression(-log[10](p)), xlab='')
   draw.scale(maf.colors, c(0, 0.5))
+
+  # Genes plot
+  plotgenes(test.genes, highlight.gene='ERAP2', label.size=1)
+
+  # Chromosome axis plot
   draw.chrom.axis(start.pos, end.pos, paste('chr', chrom))
-  use.xlim <- par('usr')[1:2]
-  plotgenes(test.genes, highlight.gene='ERAP2')
   
+  # LD plot
+  ld.plot(ld.mat, ld.coords, start.pos, end.pos)
   
+
 }
