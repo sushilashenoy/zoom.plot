@@ -6,9 +6,12 @@
 
 # test.mart <- useMart("ENSEMBL_MART_ENSEMBL", host='www.ensembl.org', dataset='hsapiens_gene_ensembl')
 # test.mart <- useMart("ENSEMBL_MART_ENSEMBL", host='feb2014.archive.ensembl.org', dataset='hsapiens_gene_ensembl')
-# head(listFilters(test.mart))
+# head(listAttributes(test.mart))
 
 BIOMART_HOST <- 'www.ensembl.org'
+NAME_FIELD <- 'external_gene_name'
+# BIOMART_HOST <- 'feb2014.archive.ensembl.org'
+# NAME_FIELD <- 'external_gene_id'
 
 #' @export
 get.regional.genes <- function(chrom, start.pos, end.pos) {
@@ -27,7 +30,7 @@ get.regional.genes <- function(chrom, start.pos, end.pos) {
   
   cat('Finding genes in region:', bm.range, '...\n')
   bm.exons <- getBM(attributes=c('ensembl_transcript_id',
-                                 'external_gene_name',
+                                 NAME_FIELD,
                                  'transcript_start',
                                  'transcript_end',
                                  'exon_chrom_start',
