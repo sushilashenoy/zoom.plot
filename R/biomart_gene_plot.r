@@ -120,6 +120,7 @@ arrange.gene.rows <- function(regional.genes, start.pos, end.pos, label.size=0.7
   if ( missing(end.pos) ) end.pos <- attr(regional.genes, 'end.pos')
   
   char.width <- label.size * (end.pos-start.pos)/(par('pin')[1]/par('cin')[1])
+  min.label.width <- (end.pos-start.pos)/(par('pin')[1]/par('cin')[1])
   row.occupied <- rep(-Inf, nrow(regional.genes))
   gene.rows <- rep(0, nrow(regional.genes))
   
@@ -127,7 +128,7 @@ arrange.gene.rows <- function(regional.genes, start.pos, end.pos, label.size=0.7
   for ( i in order(regional.genes$left) ) {
     # Starting from row 1, search for a row where this gene will fit
     row <- 1
-    label.width <- char.width * (nchar(regional.genes$name[i])+1)
+    label.width <- max(min.label.width, char.width * (nchar(regional.genes$name[i])+1))
     while ( row.occupied[row] + label.width > regional.genes$left[i] ) {
       row <- row + 1
     }
@@ -142,13 +143,26 @@ arrange.gene.rows <- function(regional.genes, start.pos, end.pos, label.size=0.7
 
 
 #' @export
-plotgenes <- function(regional.genes, gene.rows, start.pos, end.pos, highlight.gene, label.size=0.75) {
+plotgenes <- function(regional.genes, gene.rows, start.pos, end.pos, highlight.gene, label.size=0.75, max.rows=5) {
   if ( is.null(regional.genes) ) return ( invisible(NULL) )
   
   if ( missing(start.pos) ) start.pos <- attr(regional.genes, 'start.pos')
+  else {
+    regional.genes <- regional.genes[regional.genes$end > start.pos, ]
+  }
   if ( missing(end.pos) ) end.pos <- attr(regional.genes, 'end.pos')
+  else {
+    regional.genes <- regional.genes[regional.genes$start < end.pos, ]
+  }
   
   if ( missing(gene.rows) ) gene.rows <- arrange.gene.rows(regional.genes, start.pos, end.pos, label.size)
+  
+  if ( max(gene.rows) > max.rows ) {
+    hide.labels <- TRUE
+    gene.rows <- arrange.gene.rows(regional.genes, start.pos, end.pos, label.size=0)
+  } else {
+    hide.labels <- FALSE
+  }
   
   plot(0, type='n', ylim=0.5+c(0, max(gene.rows)), xlim=c(start.pos, end.pos),
        axes=FALSE, bty='n', xlab='', ylab='', yaxs='i')
@@ -172,9 +186,11 @@ plotgenes <- function(regional.genes, gene.rows, start.pos, end.pos, highlight.g
       lines(c(exon.starts[e], exon.ends[e]), c(gene.rows[i], gene.rows[i]),
             lwd=8, lend=1, col=gene.color[i])
       })
-    text(max(par('usr')[1], regional.genes$left[i]), gene.rows[i],
-         regional.genes$name[i],
-         pos=2, offset=0.25, cex=label.size, xpd=NA) # family='mono', 
+    if ( ! hide.labels ) {
+      text(max(par('usr')[1], regional.genes$left[i]), gene.rows[i],
+           regional.genes$name[i],
+           pos=2, offset=0.25, cex=label.size, xpd=NA) # family='mono', 
+    }
   })
   
   invisible(NULL)
