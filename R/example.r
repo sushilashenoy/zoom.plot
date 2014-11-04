@@ -4,17 +4,17 @@ if ( interactive() ) {
   library('zoom.plot')
   # To use older chromosome coordinates!! Only have to do this once per package load.
   load.gene.mart('hg37')
+  # To go back to default (newer) coordinates use:
+  # load.gene.mart()
   
   # Define colors for manhattan plot
   maf.colors <- c(rgb(20:0/20, 0, 0), rgb(0, 1:20/20, 0))
-  
+
   # Set a location
-  chrom <- 5
-  loc <- 96252589
-  window <- 5e5
-  
-  start.pos <- loc - window
-  end.pos <- loc + window
+  chrom <- 6
+  start.pos <- 28808339
+  end.pos <- 30796642
+  end.pos <- 29500000
   
   # Make up SNP data for a manhattan plot
   snp.coords <- floor(runif(100, start.pos, end.pos))
@@ -47,7 +47,7 @@ if ( interactive() ) {
   draw.scale(maf.colors, c(0, 0.5), y.shift=-1, xpd=NA)
 
   # Genes plot
-  plotgenes(test.genes, highlight.gene='ERAP2', label.size=1)
+  plotgenes(test.genes, highlight.gene='MOG', label.size=1)
 
   # Chromosome axis plot
   draw.chrom.axis(start.pos, end.pos, paste('chr', chrom))
