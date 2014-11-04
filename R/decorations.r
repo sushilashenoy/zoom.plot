@@ -80,11 +80,18 @@ draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, label.chrom=TRUE, la
 #' @seealso \code{\link{draw.scale}} for drawing a color scale
 #' @export
 assign.scale.colors <- function(x, scale.colors, scale.range) {
+  x.missing <- is.na(x)
+  
+  x[x.missing] <- mean(x, na.rm=TRUE)
+  
   if ( missing(scale.range) ) scale.range <- range(x)
   x.scaled <- (x-scale.range[1])/diff(scale.range)
   color.idx <- 1+floor(x.scaled*(length(scale.colors)-1))
   color.idx <- pmax(pmin(color.idx, length(scale.colors)), 1)
-  return ( scale.colors[color.idx] )
+  
+  x.colors <- scale.colors[color.idx]
+  x.colors[x.missing] <- NA
+  return ( x.colors )
 }
 
 
