@@ -152,7 +152,7 @@ plotgenes <- function(regional.genes, gene.rows, start.pos, end.pos, highlight.g
   }
   if ( missing(end.pos) ) end.pos <- attr(regional.genes, 'end.pos')
   else {
-    regional.genes <- regional.genes[regional.genes$start < end.pos, ]
+    regional.genes <- regional.genes[regional.genes$end > start.pos, ]
   }
   
   if ( missing(gene.rows) ) gene.rows <- arrange.gene.rows(regional.genes, start.pos, end.pos, label.size)
@@ -164,7 +164,7 @@ plotgenes <- function(regional.genes, gene.rows, start.pos, end.pos, highlight.g
     hide.labels <- FALSE
   }
   
-  plot(0, type='n', ylim=0.5+c(0, max(gene.rows)), xlim=c(start.pos, end.pos),
+  plot(0, type='n', ylim=0.5+c(0, max(1, gene.rows)), xlim=c(start.pos, end.pos),
        axes=FALSE, bty='n', xlab='', ylab='', yaxs='i')
   
   gene.color <- rep('blue', nrow(regional.genes))
@@ -181,7 +181,7 @@ plotgenes <- function(regional.genes, gene.rows, start.pos, end.pos, highlight.g
     
     exon.starts <- unlist(strsplit(regional.genes$exon.starts[i], ',', fixed=TRUE))
     exon.ends <- unlist(strsplit(regional.genes$exon.ends[i], ',', fixed=TRUE))
-
+    if ( length(exon.starts)==0 ) next
     sapply(1:length(exon.starts), function (e) {
       lines(c(exon.starts[e], exon.ends[e]), c(gene.rows[i], gene.rows[i]),
             lwd=8, lend=1, col=gene.color[i])
