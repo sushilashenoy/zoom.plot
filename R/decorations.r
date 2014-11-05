@@ -25,16 +25,16 @@ prettybp <- function (n, round.digits=2, signif.digits=NULL, space=TRUE) {
     return ( paste(n/1e6, 'Mb', sep=use.sep))
   } else if ( log10(n) >= 3) {
     if ( !is.null(signif.digits) ) {
-      return ( paste(signif(n/1e3, signif.digits), 'Mb', sep=use.sep))
+      return ( paste(signif(n/1e3, signif.digits), 'kb', sep=use.sep))
     } else if ( !is.null(round.digits) ) {
-      return ( paste(round(n/1e3, round.digits), 'Mb', sep=use.sep))
+      return ( paste(round(n/1e3, round.digits), 'kb', sep=use.sep))
     }
     return ( paste(n/1e3, 'kb', sep=use.sep))
   }
   if ( !is.null(signif.digits) ) {
-    return ( paste(signif(n, signif.digits), 'Mb', sep=use.sep))
+    return ( paste(signif(n, signif.digits), 'bp', sep=use.sep))
   } else if ( !is.null(round.digits) ) {
-    return ( paste(round(n, round.digits), 'Mb', sep=use.sep))
+    return ( paste(round(n, round.digits), 'bp', sep=use.sep))
   }
   return ( paste(n, 'bp', sep=use.sep) )
 }

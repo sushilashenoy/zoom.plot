@@ -149,6 +149,7 @@ linkage.disequilibrium.D.prime <- function(X1, X2) {
 
 #' @export
 ld.matrix <- function(genotypes, mc.cores) {
+  require('parallel')
   stopifnot(max(genotypes, na.rm=TRUE) <= 2,
             min(genotypes, na.rm=TRUE) >= 0)
   
