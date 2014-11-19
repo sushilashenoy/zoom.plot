@@ -15,13 +15,13 @@ extend.color.range <- function(colors, n, weight=rep(1, length(colors)-1)) {
 }
 
 # # Example!
-library('RColorBrewer')
-wee.colors <- brewer.pal(9, 'Spectral')
+# library('RColorBrewer')
+# wee.colors <- brewer.pal(9, 'Spectral')
 # wee.colors <- c(rgb(0, 0:3/3, 0), rgb(1:3/3, 1, 1:3/3))
-wee.more.colors <- extend.color.range(wee.colors, 100)
-wee.nonlinear.colors <- extend.color.range(wee.colors, 100, c(1:8))
-
-par(mfcol=c(1, 3))
-image(matrix(1:100, 1), col=wee.colors)
-image(matrix(1:100, 1), col=wee.more.colors)
-image(matrix(1:100, 1), col=wee.nonlinear.colors)
+# wee.more.colors <- extend.color.range(wee.colors, 100)
+# wee.nonlinear.colors <- extend.color.range(wee.colors, 100, c(1:8))
+# 
+# par(mfcol=c(1, 3))
+# image(matrix(1:100, 1), col=wee.colors)
+# image(matrix(1:100, 1), col=wee.more.colors)
+# image(matrix(1:100, 1), col=wee.nonlinear.colors)
