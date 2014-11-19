@@ -11,15 +11,14 @@ if ( interactive() ) {
   maf.colors <- c(rgb(20:0/20, 0, 0), rgb(0, 1:20/20, 0))
 
   # Set a location
-  chrom <- 6
-  start.pos <- 28808339
-  end.pos <- 30796642
-  end.pos <- 29500000
+  chrom <- 14
+  start.pos <- 76398831
+  end.pos <- 76594340
   
   # Make up SNP data for a manhattan plot
   snp.coords <- floor(runif(100, start.pos, end.pos))
-  snp.logp <- -log10(runif(100))
-  snp.mafs <- runif(100, 0.1, 0.49)
+  snp.logp <- -log10(runif(length(snp.coords)))
+  snp.mafs <- runif(length(snp.coords), 0.1, 0.49)
   
   # Make up a fake LD matrix based on a subset of SNPs
   ld.mat <- matrix(runif(20*20), 20)
@@ -44,7 +43,7 @@ if ( interactive() ) {
   plot(snp.coords, snp.logp, pch=20, col=snp.colors,
        xaxt='n', bty='n', xlim=c(start.pos, end.pos), xaxs='i',
        ylab=expression(-log[10](p)), xlab='')
-  draw.scale(maf.colors, c(0, 0.5), y.shift=-1, xpd=NA)
+  draw.scale(maf.colors, c(0, 0.5), y.shift=-1, xpd=NA, cex=0.6)
 
   # Genes plot
   plotgenes(test.genes, highlight.gene='MOG', label.size=1)
