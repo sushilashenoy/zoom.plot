@@ -1,0 +1,11 @@
+Package: zoom.plot
+Type: Package
+Title: Modular zoom plots for genomic data
+Version: 0.1.2
+Date: 2014-01-30
+Author: Sushila
+Maintainer: Sushila <sas2030@med.cornell.edu>
+Description: Modular zoom plots for genomic data
+License: None
+Suggests: biomaRt, parallel, compiler
+LinksTo: stats
