@@ -4,6 +4,11 @@
 # all.datasets <- listDatasets(useMart('ENSEMBL_MART_ENSEMBL', host='feb2014.archive.ensembl.org'))
 # print(all.datasets[all.datasets$dataset=='hsapiens_gene_ensembl', ])
 
+# print(all.datasets[all.datasets$dataset=='dmelanogaster_gene_ensembl', ])
+# test.mart <- useMart("ENSEMBL_MART_ENSEMBL", host='www.ensembl.org', dataset='dmelanogaster_gene_ensembl')
+# test.attr <- listAttributes(test.mart)
+# test.filt <- listFilters(test.mart)
+
 # test.mart <- useMart("ENSEMBL_MART_ENSEMBL", host='www.ensembl.org', dataset='hsapiens_gene_ensembl')
 # test.mart <- useMart("ENSEMBL_MART_ENSEMBL", host='feb2014.archive.ensembl.org', dataset='hsapiens_gene_ensembl')
 # head(listAttributes(test.mart))
@@ -26,7 +31,8 @@ load.gene.mart <- function(version='hg38',
                               'transcript_end',
                               'exon_chrom_start',
                               'exon_chrom_end')
-  BIOMART_OPTIONS$filters <- c("chromosomal_region", 'with_ccds')
+  BIOMART_OPTIONS$filters <- c('with_ccds')
+  BIOMART_OPTIONS$filter.values <- c(TRUE)
   BIOMART_OPTIONS$mart <- 'ENSEMBL_MART_ENSEMBL'
   BIOMART_OPTIONS$dataset <- 'hsapiens_gene_ensembl'
   
@@ -43,7 +49,7 @@ load.gene.mart <- function(version='hg38',
     BIOMART_OPTIONS$dataset <- biomart.dataset
   }
   
-  if ( version=='hg37' ) {
+  if ( version == 'hg37' ) {
     BIOMART_OPTIONS$host <- 'feb2014.archive.ensembl.org'
     BIOMART_OPTIONS$fields <- c('ensembl_transcript_id',
                          'external_gene_id',
@@ -51,7 +57,11 @@ load.gene.mart <- function(version='hg38',
                          'transcript_end',
                          'exon_chrom_start',
                          'exon_chrom_end')
-  } 
+  } else if ( version == 'BDGP5' ) {
+    BIOMART_OPTIONS$dataset <- 'dmelanogaster_gene_ensembl'
+    BIOMART_OPTIONS$filters <- NULL
+    BIOMART_OPTIONS$filter.values <- NULL
+  }
   
   BIOMART_OPTIONS$ens.mart <- useMart(BIOMART_OPTIONS$mart,
                                       host=BIOMART_OPTIONS$host,
@@ -74,8 +84,9 @@ get.regional.genes <- function(chrom, start.pos, end.pos) {
   
   cat('Finding genes in region:', bm.range, '...\n')
   bm.exons <- getBM(attributes=BIOMART_OPTIONS$fields,
-                    filters=BIOMART_OPTIONS$filters,
-                    values=list(bm.range, TRUE), mart=BIOMART_OPTIONS$ens.mart)
+                    filters=c("chromosomal_region", BIOMART_OPTIONS$filters),
+                    values=c(bm.range, BIOMART_OPTIONS$filter.values),
+                    mart=BIOMART_OPTIONS$ens.mart)
   
   # Replace long names with shorter ones
   colnames(bm.exons) <- c('tx.id', 'name', 'start', 'end',
@@ -83,6 +94,7 @@ get.regional.genes <- function(chrom, start.pos, end.pos) {
   
   if ( nrow(bm.exons) == 0 ) {
     cat('No genes found!\n')
+    plot(0, ann=FALSE, bty='n', xaxt='n', yaxt='n', type='n')
     return ( NULL )
   }
   
