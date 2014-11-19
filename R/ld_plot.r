@@ -10,6 +10,11 @@ complement <- function( marker ) {
 # MLE method for calculating D'
 LD.D.prime.matrix <- function(X, mc.cores) {
   
+  if ( min(X, na.rm=TRUE) < 0 && max(X, na.rm=TRUE) < 2 ) {
+    warn('Converting -1/0/1 coded genotypes to 0/1/2')
+    X <- X+1
+  }
+  
   # X need to be coded as 0, 1, 2
   stopifnot(min(X, na.rm=TRUE) >= 0, max(X, na.rm=TRUE) <= 2)
   
