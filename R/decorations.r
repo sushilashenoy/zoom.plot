@@ -53,7 +53,7 @@ draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, label.chrom=TRUE, la
   plot(0, type='n', ylim=c(-1, 1), xlim=c(start.pos, end.pos),
        axes=FALSE, bty='n', xlab='', ylab='', yaxs='i')
   
-  abline(h=0)
+  abline(h=0, xpd=FALSE)
   
   ticks.at <- axTicks(1)
   plot.height <- par('pin')[2]
