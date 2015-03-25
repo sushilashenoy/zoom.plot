@@ -36,13 +36,26 @@ thin <- function(n, k=2000) {
   return ( thin.idx )
 }
 
-
+#' Fast QQ plots
+#' 
+#' QQ plots with lots of points can be slow. Since most of the points overlap
+#' we don't actually have to plot all of them (and in many cases the output
+#' will be identical.)
+#' 
+#' This function will either take a set of indices or a value k (default 2000)
+#' and sample that many pvalues, then plot the log observed vs expected pvals
+#' in a nice way.
+#' 
 #' @export
-thin.qqplot <- function(pvals, thin.idx=NULL, ...) {
+thin.qqplot <- function(pvals, thin.idx=NULL, k=2000, ...) {
   
   n.genotypes <- length(pvals)
   if ( missing(thin.idx) ) {
-    thin.idx <- thin(n.genotypes)
+    if ( is.null(k) ) {
+      thin.idx <- thin(n.genotypes)
+    } else {
+      thin.idx <- thin(n.genotypes, k)
+    }
   }
   
   thin.logp.exp <- -log10(thin.idx/n.genotypes)
