@@ -9,6 +9,14 @@ marginlabels(x, y = NULL, labels = seq_along(x), margin = 4,
   rad = 0.15, ...)
 }
 \description{
-Label points from the margin
+Labels are sorted according to the axis along which they are labeled.
+This could be made a lot better since this often ends up in crossed lines..
+}
+\examples{
+y <- rnorm(100)
+x <- runif(100)
+plot(x, y, pch=20, bty='n')
+label.pts <- tail(order(y), 10)
+marginlabels(x[label.pts], y[label.pts], margin=3, lty=3, rad=0.05)
 }
 

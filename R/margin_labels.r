@@ -1,4 +1,5 @@
-
+# This function is pretty broken because it doesn't consider the difference in scale between axes.
+# It also probably doesn't need to always (ever) shorten both ends at least for margin labels...
 shorten <- function (x0, y0, x1, y1, rad) {
   line.lengths <- sqrt((x1-x0)^2+(y1-y0)^2)
   pct.short <- rad/line.lengths
@@ -14,6 +15,15 @@ shorten <- function (x0, y0, x1, y1, rad) {
 
 #' Label points from the margin
 #' 
+#' Labels are sorted according to the axis along which they are labeled.
+#' This could be made a lot better since this often ends up in crossed lines..
+#' 
+#' @examples
+#' y <- rnorm(100)
+#' x <- runif(100)
+#' plot(x, y, pch=20, bty='n')
+#' label.pts <- tail(order(y), 10)
+#' marginlabels(x[label.pts], y[label.pts], margin=3, lty=3, rad=0.05)
 #' @export
 marginlabels <- function(x, y = NULL, labels=seq_along(x), margin=4,
                          col='black', lty=1, lwd=1, pch=1, pch.cex=1, las=2,
@@ -58,5 +68,5 @@ marginlabels <- function(x, y = NULL, labels=seq_along(x), margin=4,
   
   do.call(segments, connect.lines)
   
-  axis(margin, at=tick.pos, labels, las=las, lwd=0, line=-0.5)
+  axis(margin, at=tick.pos, labels, las=las, lwd=0, lwd.tick=lwd, lty=lty, line=0)
 }
