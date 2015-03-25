@@ -49,7 +49,8 @@ prettybp <- function (n, round.digits=2, signif.digits=NULL, space=TRUE) {
 #' labels
 #' @seealso \code{\link{draw.scale}} for drawing a color scale bar
 #' @export
-draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, label.chrom=TRUE, label.scale=TRUE, ...) {
+draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, label.chrom=TRUE,
+                            label.scale=TRUE, tick.length=0.1, ...) {
   plot(0, type='n', ylim=c(-1, 1), xlim=c(start.pos, end.pos),
        axes=FALSE, bty='n', xlab='', ylab='', yaxs='i')
   
@@ -57,7 +58,7 @@ draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, label.chrom=TRUE, la
   
   ticks.at <- axTicks(1)
   plot.height <- par('pin')[2]
-  sapply(ticks.at, function (x) { lines(c(x, x), c(-0.1, 0.1)/plot.height)})
+  sapply(ticks.at, function (x) { lines(c(x, x), c(-tick.length, tick.length)/plot.height)})
   text(ticks.at, rep(0, length(ticks.at)), ticks.at/1e6, pos=1, xpd=NA, ...)
   if ( label.scale ) {
     text(par('usr')[2], 0, 'Mb', pos=4, xpd=NA, ...)
