@@ -1,6 +1,7 @@
 
-# require('zoom.plot')
-
+#' Zoom in manhattan plot with gene models and LD plotted below.
+#' 
+#' @export
 zoom.plot <- function(pvals, gene.id, all.snps, snp.id=NULL, genotypes,
                       window=1e6, min.snps=10, color='maf',
                       img.height=700, img.width=1200, img.prefix="", save.image=TRUE) {
