@@ -85,7 +85,7 @@ get.regional.genes <- function(chrom, start.pos, end.pos) {
   cat('Finding genes in region:', bm.range, '...\n')
   bm.exons <- getBM(attributes=BIOMART_OPTIONS$fields,
                     filters=c("chromosomal_region", BIOMART_OPTIONS$filters),
-                    values=c(bm.range, BIOMART_OPTIONS$filter.values),
+                    values=list(bm.range, BIOMART_OPTIONS$filter.values),
                     mart=BIOMART_OPTIONS$ens.mart)
   
   # Replace long names with shorter ones
@@ -177,7 +177,7 @@ plotgenes <- function(regional.genes, gene.rows, start.pos, end.pos, highlight.g
   }
   
   plot(0, type='n', ylim=0.5+c(0, max(1, gene.rows)), xlim=c(start.pos, end.pos),
-       axes=FALSE, bty='n', xlab='', ylab='', yaxs='i')
+       axes=FALSE, bty='n', xlab='', ylab='', yaxs='i', xaxs='i')
   
   gene.color <- rep('blue', nrow(regional.genes))
   if ( !missing(highlight.gene) ) {
