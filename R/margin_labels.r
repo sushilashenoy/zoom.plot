@@ -32,6 +32,7 @@ marginlabels <- function(x, y = NULL, labels=seq_along(x), margin=4,
     new.order <- order(x)
     x <- x[new.order]
     y <- y[new.order]
+    labels <- labels[new.order]
     if ( !missing(col) && length(col) == len ) col <- col[new.order]
     label.x <- seq(par('usr')[1], par('usr')[2], length.out=len+2)[-c(1, len+2)]
     label.y <- par('usr')[if ( margin ==  2) 3 else 4]
@@ -40,6 +41,7 @@ marginlabels <- function(x, y = NULL, labels=seq_along(x), margin=4,
     new.order <- order(y)
     x <- x[new.order]
     y <- y[new.order]
+    labels <- labels[new.order]
     if ( !missing(col) && length(col) == len ) col <- col[new.order]
     label.y <- seq(par('usr')[3], par('usr')[4], length.out=len+2)[-c(1, len+2)]
     label.x <- par('usr')[if ( margin ==  1) 1 else 2]
