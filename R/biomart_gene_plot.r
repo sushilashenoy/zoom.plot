@@ -15,6 +15,23 @@
 
 BIOMART_OPTIONS <- new.env(parent=emptyenv())
 
+#' Load gene database alternate version or organism.
+#' 
+#' By default we will look up human (hg38) gene models. This function should be
+#' called once after the package is loaded to use a different biomart database.
+#' 
+#' @examples
+#'# To use hg37 genomic coordinates
+#' load.gene.mart('hg37')
+#' 
+#'# To use drosophila gene models
+#' load.gene.mart('BDGP5')
+#' 
+#' # To use mouse gene models:
+#' load.gene.mart(biomart.dataset='mmusculus_gene_ensembl',
+#'                biomart.filters=NULL,
+#'                biomart.filter.values=NULL)
+#' 
 #' @export
 load.gene.mart <- function(version='hg38',
                            biomart.host,

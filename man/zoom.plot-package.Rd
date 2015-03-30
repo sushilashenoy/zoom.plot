@@ -1,6 +1,5 @@
 \name{zoom.plot-package}
 \alias{zoom.plot-package}
-\alias{zoom.plot}
 \docType{package}
 \title{
 Various functions for plotting genomic data
