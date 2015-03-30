@@ -1,5 +1,7 @@
 #' @export
-derez <- function(x, new.nrow, new.ncol, row.pos, col.pos) {
+derez <- function(x, new.nrow, new.ncol, row.pos, col.pos, mc.cores=1) {
+  require('parallel')
+  
   # This function only decreases resolution, doesn't increase
   new.nrow <- min(new.nrow, nrow(x))
   new.ncol <- min(new.ncol, ncol(x))
@@ -12,9 +14,9 @@ derez <- function(x, new.nrow, new.ncol, row.pos, col.pos) {
   
   # Vectorized function to calculate mean for each bin
   avg.block <- function(i, j) {
-    sapply(1:length(i), function(k) {
+    simplify2array(mclapply(1:length(i), function(k) {
       mean(x[row.beg[i[k]]:row.end[i[k]], col.beg[j[k]]:col.end[j[k]]])
-    })
+    }), mc.cores=mc.cores)
   }
 
   # Outer calls the vectorized function to generate new matrix
