@@ -16,7 +16,7 @@ derez <- function(x, new.nrow, new.ncol, row.pos, col.pos, mc.cores=1) {
   avg.block <- function(i, j) {
     simplify2array(mclapply(1:length(i), function(k) {
       mean(x[row.beg[i[k]]:row.end[i[k]], col.beg[j[k]]:col.end[j[k]]])
-    }), mc.cores=mc.cores)
+    }, mc.cores=mc.cores))
   }
 
   # Outer calls the vectorized function to generate new matrix
