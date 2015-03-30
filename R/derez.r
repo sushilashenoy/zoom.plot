@@ -1,3 +1,4 @@
+#' @export
 derez <- function(x, new.nrow, new.ncol, row.pos, col.pos) {
   # This function only decreases resolution, doesn't increase
   new.nrow <- min(new.nrow, nrow(x))
