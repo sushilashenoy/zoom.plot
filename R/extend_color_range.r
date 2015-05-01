@@ -25,3 +25,34 @@ extend.color.range <- function(colors, n, weight=rep(1, length(colors)-1)) {
 # image(matrix(1:100, 1), col=wee.colors)
 # image(matrix(1:100, 1), col=wee.more.colors)
 # image(matrix(1:100, 1), col=wee.nonlinear.colors)
+
+#' @export
+lighten.colors <- function(colors, pct) {
+  if ( length(pct) == 1 ) pct <- rep(pct, length(colors))
+  
+  red.part <- strtoi(paste('0X', substring(colors, 2, 3), sep=''))/2^8
+  grn.part <- strtoi(paste('0X', substring(colors, 4, 5), sep=''))/2^8
+  blu.part <- strtoi(paste('0X', substring(colors, 6, 7), sep=''))/2^8
+  
+  new.red <- pct+(1-pct)*red.part
+  new.grn <- pct+(1-pct)*grn.part
+  new.blu <- pct+(1-pct)*blu.part
+  
+  return ( rgb(new.red, new.grn, new.blu) )
+}
+
+
+#' @export
+darken.colors <- function(colors, pct) {
+  if ( length(pct) == 1 ) pct <- rep(pct, length(colors))
+  
+  red.part <- strtoi(paste('0X', substring(colors, 2, 3), sep=''))/2^8
+  grn.part <- strtoi(paste('0X', substring(colors, 4, 5), sep=''))/2^8
+  blu.part <- strtoi(paste('0X', substring(colors, 6, 7), sep=''))/2^8
+  
+  new.red <- (1-pct)*red.part
+  new.grn <- (1-pct)*grn.part
+  new.blu <- (1-pct)*blu.part
+  
+  return ( rgb(new.red, new.grn, new.blu) )
+}
