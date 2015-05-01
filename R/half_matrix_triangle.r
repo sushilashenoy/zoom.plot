@@ -1,14 +1,14 @@
 
 #' @export
-triangleplot <- function(mat, positions, colors, color.scale, drawscale=TRUE, scale.cex=0.6) {
+triangleplot <- function(mat, positions, colors, color.scale, drawscale=TRUE, scale.cex=0.6, ...) {
   
-  if ( ncol(matrix) != nrow(mat) ) stop('Matrix must be square.')
+  if ( ncol(mat) != nrow(mat) ) stop('Matrix must be square.')
   
   n <- ncol(mat)
   
   if ( missing(positions) ) {
-    positions <- seq(0, 1, n)
-  } else if ( length(positions) != n ) stop('positions must match matrix size')
+    positions <- 0:(n+1)
+  } else if ( length(positions) != n && length(positions) != n+1 ) stop('positions must match matrix size')
   
   if ( is.unsorted(positions) ) warning('Positions are not in order!')
   
@@ -25,13 +25,18 @@ triangleplot <- function(mat, positions, colors, color.scale, drawscale=TRUE, sc
   
   plot(0, type='n', ylim=c(min(positions)-max(positions), 0), 
        xlim=range(positions),
-       axes=FALSE, bty='n', xlab='', ylab='')
+       axes=FALSE, xlab='', ylab='', yaxs='i', ...)
   
   # Calculate positions for SNPs
-  x.pos <- positions
-  x.pos.mids <- (x.pos[-1] + x.pos[-n])/2
-  x.pos.left <- c(x.pos[1], x.pos.mids)
-  x.pos.right <- c(x.pos.mids, x.pos[n])
+  if ( length(positions) == n) {
+    x.pos <- positions
+    x.pos.mids <- (x.pos[-1] + x.pos[-n])/2
+    x.pos.left <- c(x.pos[1], x.pos.mids)
+    x.pos.right <- c(x.pos.mids, x.pos[n])
+  } else {
+    x.pos.left <- positions[-(n+1)]
+    x.pos.right <- positions[-1]
+  }
   
   # Loop through each position in the matrix and draw polygon of appropriate shade
   for ( i in 1:n ) {
@@ -46,7 +51,7 @@ triangleplot <- function(mat, positions, colors, color.scale, drawscale=TRUE, sc
                  x.pos.right[i]-x.pos.left[j],
                  x.pos.right[i]-x.pos.right[j],
                  x.pos.left[i]-x.pos.right[j]),
-              col=fill.color, border=fill.color)
+              col=fill.color, border=fill.color, ljoin='bevel')
       # NOTE: not drawing polygon borders (i.e. border=NA) causes jagged,
       # pixelated edges. So we draw a border in the same color as the fill
     }
