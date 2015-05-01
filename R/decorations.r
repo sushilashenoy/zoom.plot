@@ -187,7 +187,12 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
     polygon(c(x1, x1, x2, x2), c(y1, y.mid, y.mid, y1), border=scale.colors[i], col=scale.colors[i], ...)
   })
   
-  text(x.ticks, rep(y2, num.labs), seq(scale.range[1], scale.range[2], length.out=num.labs),
+  
+  tick.labels <- seq(scale.range[1], scale.range[2], length.out=num.labs)
+  sigdig <- 1
+  while ( length(unique(signif(tick.labels, sigdig))) < length(tick.labels) ) sigdig <- sigdig + 1
+  
+  text(x.ticks, rep(y2, num.labs), signif(tick.labels, sigdig),
        pos=label.pos, offset=0.25, ...)
   
 }
