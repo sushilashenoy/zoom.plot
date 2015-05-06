@@ -117,6 +117,8 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 #' @param scale.offset inset (outset) amount for legend that is inside (outside)
 #' @param label.offset spacing between ticks and text labels
 #' @param box this controls whether a black border is drawn around the colors or not.
+#' @param x.shift (optional) adjust x position relative to scale size.
+#' @param y.shift(optional) adjust y position relative to scale size.
 #' 
 #' @seealso \code{\link{draw.chrom.axis}} for drawing x-axis 
 #' @export
@@ -124,7 +126,7 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
                        pos='topleft', adj=NULL, horiz=TRUE,
                        outside=FALSE, size=2, ratio=12, tick.length=0.25,
                        scale.offset=0.5, label.offset=0.1,
-                       box=TRUE) {
+                       box=TRUE, x.shift=0, y.shift=0) {
   
   
   if ( outside ) {
@@ -204,6 +206,15 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
   #     points(x1, y1, pch=8, col='red')
   #     rect(x1, y1, x2, y2, col='#ff6633')
   
+  if ( !missing(x.shift) ) {
+    x1 <- x1 + x.shift*legend.width
+    x2 <- x2 + x.shift*legend.width
+  }
+  if ( !missing(y.shift) ) {
+    y1 <- y1 + y.shift*legend.height
+    y2 <- y2 + y.shift*legend.height
+  }
+  
   if ( horiz ) {
     x.points <- seq(x1, x2, length.out=length(scale.colors)+1)
     y.mid <- y1*tick.length+y2*(1-tick.length)
@@ -232,13 +243,13 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
   
   
   tick.labels <- seq(scale.range[1], scale.range[2], length.out=num.labs)
-  sigdig <- 1
-  while ( length(unique(signif(tick.labels, sigdig))) < length(tick.labels) ) sigdig <- sigdig + 1
+  sigdig <- 0
+  while ( length(unique(round(tick.labels, sigdig))) < length(tick.labels) ) sigdig <- sigdig + 1
   if ( horiz ) {
-    text(x.ticks, rep(y.text, num.labs), format(signif(tick.labels, sigdig)),
+    text(x.ticks, rep(y.text, num.labs), format(round(tick.labels, sigdig)),
          adj=c(0.5, adj[2]))
   } else {
-    text(rep(x.text, num.labs), y.ticks, format(signif(tick.labels, sigdig)),
+    text(rep(x.text, num.labs), y.ticks, format(round(tick.labels, sigdig)),
          adj=c(adj[1], 0.5)) 
   }
   

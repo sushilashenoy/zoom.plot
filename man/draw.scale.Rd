@@ -7,7 +7,7 @@
 draw.scale(scale.colors, scale.range, num.labs = 6, pos = "topleft",
   adj = NULL, horiz = TRUE, outside = FALSE, size = 2, ratio = 12,
   tick.length = 0.25, scale.offset = 0.5, label.offset = 0.1,
-  box = TRUE)
+  box = TRUE, x.shift = 0, y.shift = 0)
 }
 \arguments{
 \item{scale.colors}{a vector of colors}
@@ -35,6 +35,10 @@ draw.scale(scale.colors, scale.range, num.labs = 6, pos = "topleft",
 \item{label.offset}{spacing between ticks and text labels}
 
 \item{box}{this controls whether a black border is drawn around the colors or not.}
+
+\item{x.shift}{(optional) adjust x position relative to scale size.}
+
+\item{y.shift(optional)}{adjust y position relative to scale size.}
 }
 \description{
 Adds a color scale legend to the current plot
