@@ -4,8 +4,10 @@
 \alias{draw.scale}
 \title{Draw a color scale bar}
 \usage{
-draw.scale(scale.colors, scale.range, num.labs = 6, position = "topleft",
-  size = 3, width.to.height = 20, x.offset, y.offset, x.shift, y.shift, ...)
+draw.scale(scale.colors, scale.range, num.labs = 6, pos = "topleft",
+  adj = NULL, horiz = TRUE, outside = FALSE, size = 2, ratio = 12,
+  tick.length = 0.25, scale.offset = 0.5, label.offset = 0.1,
+  box = TRUE)
 }
 \arguments{
 \item{scale.colors}{a vector of colors}
@@ -14,37 +16,29 @@ draw.scale(scale.colors, scale.range, num.labs = 6, position = "topleft",
 
 \item{num.labs}{(optional) number of labels to draw}
 
-\item{position}{(optional) either 'topleft' 'topright' 'bottomleft' or
-'bottomright'}
+\item{pos}{position for scale, either a keyword such as "top", "topleft" or a numeric vector length 2}
 
-\item{size}{(optional) approximate length in inches}
+\item{adj}{controls the anchoring of the scale in respect to \code{pos}}
 
-\item{width.to.height}{(optional) ratio of scale bar width to height}
+\item{horiz}{TRUE for horizontal (default) or FALSE for vertical bar}
 
-\item{x.offset}{(optional) adjust x position (uses \code{par('usr')} scale).}
+\item{outside}{TRUE to display legend within the plotting area (default) or FALSE to place it outside}
 
-\item{y.offset}{(optional) adjust y position (uses \code{par('usr')} scale).}
+\item{size}{approximate length in inches}
 
-\item{x.shift}{(optional) adjust x position relative to scale size.}
+\item{ratio}{ratio of scale bar width to height}
 
-\item{...}{(optional) addition options to pass to plotting commands for
-drawing labels, lines and shapes}
+\item{tick.length}{number between 0 and 1, controls how long the ticks are vs the color boxes.}
 
-\item{y.shift(optional)}{adjust y position relative to scale size.}
+\item{scale.offset}{inset (outset) amount for legend that is inside (outside)}
+
+\item{label.offset}{spacing between ticks and text labels}
+
+\item{box}{this controls whether a black border is drawn around the colors or not.}
 }
 \description{
-\code{draw.scale} adds a color scale to the corner of the current plot
+Adds a color scale legend to the current plot
 with specified colors and range
-}
-\details{
-Currently only a horizontal scale bar is supported. To adjust position in
-plot coordinates use x.offset and y.offset. To adjust relative position use
-x.shift and y.shift.
-
-Keep in mind that if you shift the scale bar away from the plotting area
-(i.e. into the margins), you may need to specify the additional parameter
-xpd=NA which will be passed to the plotting commands and allows drawing
-in the margins.
 }
 \seealso{
 \code{\link{draw.chrom.axis}} for drawing x-axis

@@ -145,9 +145,9 @@ zoom.plot <- function(pvals, gene.id, all.snps, snp.id=NULL, genotypes,
   points(x.positions, -log10(pvals[include.snps]), pch=20, col=snp.colors)
   
   if ( color == 'maf' ) {
-    draw.scale(maf.colors, c(0, 0.5), num.labs=6, position='topright', cex=0.6)
+    draw.scale(maf.colors, c(0, 0.5), num.labs=6, pos='topright')
   } else if ( color == 'het' ) {
-    draw.scale(het.colors, c(0, 1), num.labs=6, position='topright', cex=0.6)
+    draw.scale(het.colors, c(0, 1), num.labs=6, pos='topright')
   }
   
   par(mar=c(0.5, 4, 0, 0.5))

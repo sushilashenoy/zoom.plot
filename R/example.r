@@ -43,7 +43,7 @@ if ( interactive() ) {
   plot(snp.coords, snp.logp, pch=20, col=snp.colors,
        xaxt='n', bty='n', xlim=c(start.pos, end.pos), xaxs='i',
        ylab=expression(-log[10](p)), xlab='')
-  draw.scale(maf.colors, c(0, 0.5), y.shift=-1, xpd=NA, cex=0.6)
+  draw.scale(maf.colors, c(0, 0.5), pos='right', outside=TRUE, horiz=FALSE)
 
   # Genes plot
   plotgenes(test.genes, highlight.gene='MOG', label.size=1)

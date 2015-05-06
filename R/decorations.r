@@ -96,9 +96,162 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 }
 
 
+
+
 #' Draw a color scale bar
 #' 
-#' \code{draw.scale} adds a color scale to the corner of the current plot
+#' Adds a color scale legend to the current plot
+#' with specified colors and range
+#' 
+#' 
+#' @param scale.colors a vector of colors
+#' @param scale.range range for scale (vector with 2 numeric elements)
+#' @param num.labs (optional) number of labels to draw
+#' @param pos position for scale, either a keyword such as "top", "topleft" or a numeric vector length 2
+#' @param adj controls the anchoring of the scale in respect to \code{pos}
+#' @param horiz  TRUE for horizontal (default) or FALSE for vertical bar
+#' @param outside TRUE to display legend within the plotting area (default) or FALSE to place it outside
+#' @param size approximate length in inches
+#' @param ratio ratio of scale bar width to height
+#' @param tick.length number between 0 and 1, controls how long the ticks are vs the color boxes. 
+#' @param scale.offset inset (outset) amount for legend that is inside (outside)
+#' @param label.offset spacing between ticks and text labels
+#' @param box this controls whether a black border is drawn around the colors or not.
+#' 
+#' @seealso \code{\link{draw.chrom.axis}} for drawing x-axis 
+#' @export
+draw.scale <- function(scale.colors, scale.range, num.labs=6,
+                       pos='topleft', adj=NULL, horiz=TRUE,
+                       outside=FALSE, size=2, ratio=12, tick.length=0.25,
+                       scale.offset=0.5, label.offset=0.1,
+                       box=TRUE) {
+  
+  
+  if ( outside ) {
+    old.par <- par(xpd=NA)
+  }
+  
+  # recognized keywords and corresponding positions
+  pos.key <- list()
+  pos.key$topleft <- c(0, 1)
+  pos.key$topright <- c(1, 1)
+  pos.key$top <- c(0.5, 1)
+  pos.key$bottomleft <- c(0, 0)
+  pos.key$bottomright <- c(1, 0)
+  pos.key$bottom <- c(0.5, 0)
+  pos.key$left <- c(0, 0.5)
+  pos.key$right <- c(1, 0.5)
+  pos.key <- data.frame(pos.key, row.names=c('x', 'y'))
+  
+  if ( is.character(pos) ) pos <- tolower(pos)
+  if ( is.character(pos) && length(pos)==1 && pos %in% names(pos.key) ) {
+    pos <- pos.key[[pos]]
+  }
+  
+  if ( !is.numeric(pos) || length(pos) != 2) {
+    warning('Invalid pos Please specify a keyword or xy pair.')
+    pos <- c(0, 1)
+  }
+  
+  # If adj is not specified it is the same as pos for inside
+  # opposite for outside
+  if ( is.null(adj) ) {
+    if ( outside )
+      adj <- 1-pos
+    else
+      adj <- pos
+  }
+  
+  par.usr <- par('usr')
+  par.pin <- par('pin')
+  
+  plot.width <- par.usr[2]-par.usr[1]
+  plot.height <- par.usr[4]-par.usr[3]
+  
+  # Calculate dimensions of scale legend
+  if ( horiz ) {
+    legend.width <- plot.width/par.pin[1]*size
+    legend.height <- plot.height/par.pin[2]*size/ratio
+  } else {
+    legend.height <- plot.height/par.pin[2]*size
+    legend.width <- plot.width/par.pin[1]*size/ratio
+  }
+  
+  x1 <- par.usr[1]+pos[1]*plot.width-adj[1]*legend.width
+  y1 <- par.usr[3]+pos[2]*plot.height-adj[2]*legend.height
+  
+  # Apply scale.offset
+  if ( horiz ) {
+    y1 <- y1-scale.offset*legend.height*2*(adj[2]-0.5)
+    x1 <- x1-scale.offset*legend.height*plot.width/plot.height*2*(adj[1]-0.5)
+  } else {
+    x1 <- x1-scale.offset*legend.width*2*(adj[1]-0.5)
+    y1 <- y1-scale.offset*legend.width*plot.height/plot.width*2*(adj[2]-0.5)
+  }
+  x2 <- x1+legend.width
+  y2 <- y1+legend.height
+  
+  # Flip depending on orientation
+  if ( horiz & adj[2] > 0.5 ) {
+    tm <- y1
+    y1 <- y2
+    y2 <- tm
+  } else if ( !horiz & adj[1] > 0.5 ) {
+    tm <- x1
+    x1 <- x2
+    x2 <- tm
+  }
+  #     points(x1, y1, pch=8, col='red')
+  #     rect(x1, y1, x2, y2, col='#ff6633')
+  
+  if ( horiz ) {
+    x.points <- seq(x1, x2, length.out=length(scale.colors)+1)
+    y.mid <- y1*tick.length+y2*(1-tick.length)
+    y.text <- y2+label.offset*(y2-y1)
+    # draw ticks
+    x.ticks <- seq(x1, x2, length.out=num.labs)
+    segments(x.ticks, rep(y1, num.labs), x.ticks, rep(y2, num.labs))
+    # draw colored boxes
+    sapply(1:length(scale.colors), function (i) {
+      rect(x.points[i], y1, x.points[i+1], y.mid, border=scale.colors[i], col=scale.colors[i])
+    })
+    if ( box ) rect(x1, y1, x2, y.mid)
+  } else {
+    y.points <- seq(y1, y2, length.out=length(scale.colors)+1)
+    x.mid <- x1*tick.length+x2*(1-tick.length)
+    x.text <- x2+label.offset*(x2-x1)
+    # draw ticks
+    y.ticks <- seq(y1, y2, length.out=num.labs)
+    segments(rep(x1, num.labs), y.ticks, rep(x2, num.labs), y.ticks)
+    # draw colored boxes
+    sapply(1:length(scale.colors), function (i) {
+      rect(x1, y.points[i], x.mid, y.points[i+1], border=scale.colors[i], col=scale.colors[i])
+    })
+    if ( box ) rect(x1, y1, x.mid, y2, border='#000000')
+  }
+  
+  
+  tick.labels <- seq(scale.range[1], scale.range[2], length.out=num.labs)
+  sigdig <- 1
+  while ( length(unique(signif(tick.labels, sigdig))) < length(tick.labels) ) sigdig <- sigdig + 1
+  if ( horiz ) {
+    text(x.ticks, rep(y.text, num.labs), format(signif(tick.labels, sigdig)),
+         adj=c(0.5, adj[2]))
+  } else {
+    text(rep(x.text, num.labs), y.ticks, format(signif(tick.labels, sigdig)),
+         adj=c(adj[1], 0.5)) 
+  }
+  
+  if ( outside ) {
+    par(old.par)
+  }
+}
+
+
+
+#' Draw a color scale bar (old version)
+#' 
+#' \code{draw.old.scale} adds a color scale to the corner of the current plot
 #' with specified colors and range
 #' 
 #' 
@@ -127,7 +280,7 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 #' 
 #' @seealso \code{\link{draw.chrom.axis}} for drawing x-axis 
 #' @export
-draw.scale <- function(scale.colors, scale.range, num.labs=6,
+draw.old.scale <- function(scale.colors, scale.range, num.labs=6,
                        position='topleft', size=3, width.to.height=20,
                        x.offset, y.offset, x.shift, y.shift, ...) {
   par.usr <- par('usr')
@@ -155,7 +308,7 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
   if ( missing(y.offset) ) y.offset <- 0
   
   if ( !missing(x.shift) ) {
-    x.offset <- x.offset + x.shift*(y2-y1)
+    x.offset <- x.offset + x.shift*(x2-x1)
   }
   
   if ( !missing(y.shift) ) {

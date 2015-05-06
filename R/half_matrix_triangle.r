@@ -58,6 +58,6 @@ triangleplot <- function(mat, positions, colors, color.scale, drawscale=TRUE, sc
   }
   
   if ( drawscale ) {
-    draw.scale(colors, color.scale, num.labs=6, position='bottomleft', cex=scale.cex)
+    draw.scale(colors, color.scale, pos='bottomleft')
   }
 }

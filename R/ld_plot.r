@@ -209,6 +209,6 @@ ld.plot <- function(ld.matrix, snp.positions, start.pos, end.pos, ld.colors, dra
   }
   
   if ( drawscale ) {
-    draw.scale(ld.colors, c(0, 1), num.labs=6, position='bottomleft', cex=scale.cex)
+    draw.scale(ld.colors, c(0, 1), pos='bottomleft')
   }
 }
