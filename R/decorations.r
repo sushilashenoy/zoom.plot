@@ -135,6 +135,8 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
   
   # recognized keywords and corresponding positions
   pos.key <- list()
+  pos.key$middle <- c(0.5, 0.5)
+  pos.key$center <- c(0.5, 0.5)
   pos.key$topleft <- c(0, 1)
   pos.key$topright <- c(1, 1)
   pos.key$top <- c(0.5, 1)
@@ -247,10 +249,10 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
   while ( length(unique(round(tick.labels, sigdig))) < length(tick.labels) ) sigdig <- sigdig + 1
   if ( horiz ) {
     text(x.ticks, rep(y.text, num.labs), format(round(tick.labels, sigdig)),
-         adj=c(0.5, adj[2]))
+         adj=c(0.5, round(adj[2])))
   } else {
     text(rep(x.text, num.labs), y.ticks, format(round(tick.labels, sigdig)),
-         adj=c(adj[1], 0.5)) 
+         adj=c(round(adj[1]), 0.5)) 
   }
   
   if ( outside ) {
