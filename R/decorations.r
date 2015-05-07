@@ -117,10 +117,14 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 #' @param scale.offset inset (outset) amount for legend that is inside (outside)
 #' @param label.offset spacing between ticks and text labels
 #' @param box this controls whether a black border is drawn around the colors or not.
-#' @param x.shift (optional) adjust x position relative to scale size.
-#' @param y.shift(optional) adjust y position relative to scale size.
+#' @param x.shift (optional) adjust x position in units of scale width.
+#' @param y.shift (optional) adjust y position in units of scale height.
 #' 
 #' @seealso \code{\link{draw.chrom.axis}} for drawing x-axis 
+#' @examples
+#' plot(1:5, 1:5, col=gray(0:4/5), pch=15)
+#' draw.scale(gray(0:4/5), c(0, 1), pos='top')
+#' draw.scale(gray(0:4/5), c(0, 1), pos='right', horiz=FALSE, outside=TRUE)
 #' @export
 draw.scale <- function(scale.colors, scale.range, num.labs=6,
                        pos='topleft', adj=NULL, horiz=TRUE,
@@ -286,8 +290,8 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
 #' @param width.to.height (optional) ratio of scale bar width to height
 #' @param x.offset (optional) adjust x position (uses \code{par('usr')} scale).
 #' @param y.offset (optional) adjust y position (uses \code{par('usr')} scale).
-#' @param x.shift (optional) adjust x position relative to scale size.
-#' @param y.shift(optional) adjust y position relative to scale size.
+#' @param x.shift (optional) adjust x position in units of scale width.
+#' @param y.shift (optional) adjust y position in units of scale height.
 #' @param ... (optional) addition options to pass to plotting commands for
 #' drawing labels, lines and shapes
 #' 

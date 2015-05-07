@@ -26,12 +26,12 @@ draw.old.scale(scale.colors, scale.range, num.labs = 6,
 
 \item{y.offset}{(optional) adjust y position (uses \code{par('usr')} scale).}
 
-\item{x.shift}{(optional) adjust x position relative to scale size.}
+\item{x.shift}{(optional) adjust x position in units of scale width.}
+
+\item{y.shift}{(optional) adjust y position in units of scale height.}
 
 \item{...}{(optional) addition options to pass to plotting commands for
 drawing labels, lines and shapes}
-
-\item{y.shift(optional)}{adjust y position relative to scale size.}
 }
 \description{
 \code{draw.old.scale} adds a color scale to the corner of the current plot

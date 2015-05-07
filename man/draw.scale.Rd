@@ -36,13 +36,18 @@ draw.scale(scale.colors, scale.range, num.labs = 6, pos = "topleft",
 
 \item{box}{this controls whether a black border is drawn around the colors or not.}
 
-\item{x.shift}{(optional) adjust x position relative to scale size.}
+\item{x.shift}{(optional) adjust x position in units of scale width.}
 
-\item{y.shift(optional)}{adjust y position relative to scale size.}
+\item{y.shift}{(optional) adjust y position in units of scale height.}
 }
 \description{
 Adds a color scale legend to the current plot
 with specified colors and range
+}
+\examples{
+plot(1:5, 1:5, col=gray(0:4/5), pch=15)
+draw.scale(gray(0:4/5), c(0, 1), pos='top')
+draw.scale(gray(0:4/5), c(0, 1), pos='right', horiz=FALSE, outside=TRUE)
 }
 \seealso{
 \code{\link{draw.chrom.axis}} for drawing x-axis
