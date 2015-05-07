@@ -100,14 +100,13 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 
 #' Draw a color scale bar
 #' 
-#' Adds a color scale legend to the current plot
-#' with specified colors and range
+#' Adds a color scale legend to the current plot with specified colors and range.
 #' 
 #' 
 #' @param scale.colors a vector of colors
-#' @param scale.range range for scale (vector with 2 numeric elements)
-#' @param num.labs (optional) number of labels to draw
-#' @param pos position for scale, either a keyword such as "top", "topleft" or a numeric vector length 2
+#' @param scale.range range for scale (vector with 2 numeric elements, e.g. as returned by \code{range()})
+#' @param num.labs (default 6) number of text labels to draw
+#' @param pos (default topright)position for scale, either a keyword such as "top", "topleft" or a numeric vector length 2
 #' @param adj controls the anchoring of the scale in respect to \code{pos}
 #' @param horiz  TRUE for horizontal (default) or FALSE for vertical bar
 #' @param outside TRUE to display legend within the plotting area (default) or FALSE to place it outside
@@ -120,11 +119,44 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 #' @param x.shift (optional) adjust x position in units of scale width.
 #' @param y.shift (optional) adjust y position in units of scale height.
 #' 
+#' @details This function draws a color scale bar in the current plot. Position argument
+#' \code{pos} can be specified by keyword: \code{'center'}, \code{'middle'},
+#' \code{'topleft'}, \code{'topright'}, \code{'top'}, \code{'bottomleft'},
+#' \code{'bottomright'}, \code{'bottom'}, \code{'left'}, or \code{'right'}.
+#' Alternately \code{pos} can be set by specifying a numeric vector of length 2,
+#' describing the x and y locations of legend, where each is a number between 0
+#' (left/bottom) and 1 (right/top). The \code{adj} argument controls the anchor
+#' point for the legend itself relative to the plot. If unspecified, it will
+#' match \code{pos}, if \code{outside} is \code{FALSE} (default) or \code{1-pos}
+#' if \code{outside} is \code{TRUE}. This alignment is offset by \code{scale.offset}
+#' so that the legend does not overlap the plot border.
+#' 
+#' The position can be further tweaked using the \code{x.shift} and \code{y.shift}
+#' arguments. 1 will shift the legend right/up by 1 scale width/height.
+#' 
+#' The size and shape of the color legend are controlled by \code{size}, which
+#' is the approximate length of the longer dimension in inches, and \code{ratio},
+#' which is the ratio between width and height (or vice versa for vertical scale bars)
+#' and should generally be > 1.
+#' 
+#' There are several arguments that control how the legend is drawn. The
+#' \code{tick.length} (between 0 and 1) argument controls how much of the shorter
+#' dimension of the legend is taken up by the color scale vs the ticks. \code{label.offset}
+#' controls the spacing between the ticks and the text labels. Parameters to modify
+#' text size should be set via \code{par()} prior to calling this function. Setting
+#' \code{box = FALSE} will remove the black outline around the colors.
+#' 
+#' 
 #' @seealso \code{\link{draw.chrom.axis}} for drawing x-axis 
 #' @examples
 #' plot(1:5, 1:5, col=gray(0:4/5), pch=15)
+#' # Place a horizontal scale bar a the top, inside the plot.
 #' draw.scale(gray(0:4/5), c(0, 1), pos='top')
-#' draw.scale(gray(0:4/5), c(0, 1), pos='right', horiz=FALSE, outside=TRUE)
+#' # Place a vertical scale bar too the right, outside the plot.
+#' draw.scale(gray(0:4/5), c(76.1, 76.92), pos='right', horiz=FALSE, outside=TRUE)
+#' # Place a horizontal  scale bar at the top left, outside the plot, but
+#' aligned with the left edge of the plot
+#' draw.scale(gray(0:4/5), c(1, 10), pos='topleft', adj=c(0, 0), outside=TRUE)
 #' @export
 draw.scale <- function(scale.colors, scale.range, num.labs=6,
                        pos='topleft', adj=NULL, horiz=TRUE,
@@ -298,8 +330,8 @@ draw.scale <- function(scale.colors, scale.range, num.labs=6,
 #' @seealso \code{\link{draw.chrom.axis}} for drawing x-axis 
 #' @export
 draw.old.scale <- function(scale.colors, scale.range, num.labs=6,
-                       position='topleft', size=3, width.to.height=20,
-                       x.offset, y.offset, x.shift, y.shift, ...) {
+                           position='topleft', size=3, width.to.height=20,
+                           x.offset, y.offset, x.shift, y.shift, ...) {
   par.usr <- par('usr')
   par.pin <- par('pin')
   
@@ -340,7 +372,7 @@ draw.old.scale <- function(scale.colors, scale.range, num.labs=6,
   x.points <- seq(x1+(x2-x1)*0.1, x1+(x2-x1)*0.9, length.out=length(scale.colors)+1)
   y.mid <- y1+(y2-y1)/2
   
-
+  
   
   x.ticks <- seq(x1+(x2-x1)*0.1, x1+(x2-x1)*0.9, length.out=num.labs)
   arrows(x.ticks, rep(y1, num.labs), x.ticks, rep(y2, num.labs), length=0, ...)
