@@ -6,14 +6,14 @@
 #' Returns k indices between 1:n such that sampling is very dense at the start and much less dense at the end.
 #' 
 #' @export
-thin <- function(n, k=2000) {
-  if ( n < k ) {
-    return (1:n)
-  }
+thin <- function(n, k=2000, max.idx=n) {
   
-  # Generate k samples x such that exp(n-x) is uniformly distributed
-  rx <- sort(log(runif(k)), decreasing=TRUE)
-  x <- round(n-(rx-min(rx))/(max(rx)-min(rx))*(n-1))
+  if ( max.idx > n ) max.idx <- n
+  if ( max.idx <= k ) return (1:max.idx)
+  
+  # Generate k samples between 1 and max.idx
+  # such that -log10(x/n) is uniformly distributed
+  x <- round(max.idx*10^(-(k:1)/k*log10(n)))
   
   # Ensure each x is unique (Equivalently, diff(x) != 0)
   i <- 1
