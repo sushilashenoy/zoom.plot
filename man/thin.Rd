@@ -4,9 +4,19 @@
 \alias{thin}
 \title{Sampling for qq plots}
 \usage{
-thin(n, k = 2000)
+thin(n, k = 2000, max.idx = n)
 }
 \description{
-Returns k indices between 1:n such that sampling is very dense at the start and much less dense at the end.
+Returns k indices between 1:max.idx (x) such that -log(x/n) is uniformly
+distributed. This is useful to reduce overplotting when plotting
+log-transformed uniform data (such as p-values in a qq plot).
+}
+\examples{
+n <- 1e5
+x <- sort(runif(n))
+thin.idx <- thin(n, 500)
+par(mfcol=c(1, 2))
+plot(-log10(1:n), -log10(x), ann=FALSE)
+plot(-log10(thin.idx), -log10(x[thin.idx]), ann=FALSE)
 }
 

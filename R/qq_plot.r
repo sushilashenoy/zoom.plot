@@ -3,7 +3,17 @@
 
 #' Sampling for qq plots
 #' 
-#' Returns k indices between 1:n such that sampling is very dense at the start and much less dense at the end.
+#' Returns k indices between 1:max.idx (x) such that -log(x/n) is uniformly
+#' distributed. This is useful to reduce overplotting when plotting
+#' log-transformed uniform data (such as p-values in a qq plot).
+#' 
+#' @examples
+#' n <- 1e5
+#' x <- sort(runif(n))
+#' thin.idx <- thin(n, 500)
+#' par(mfcol=c(1, 2))
+#' plot(-log10(1:n), -log10(x), ann=FALSE)
+#' plot(-log10(thin.idx), -log10(x[thin.idx]), ann=FALSE)
 #' 
 #' @export
 thin <- function(n, k=2000, max.idx=n) {
@@ -13,7 +23,7 @@ thin <- function(n, k=2000, max.idx=n) {
   
   # Generate k samples between 1 and max.idx
   # such that -log10(x/n) is uniformly distributed
-  x <- round(max.idx*10^(-(k:1)/k*log10(n)))
+  x <- round(max.idx*exp(-(k:1)/k*log(n)))
   
   # Ensure each x is unique (Equivalently, diff(x) != 0)
   i <- 1
@@ -38,26 +48,21 @@ thin <- function(n, k=2000, max.idx=n) {
 #' we don't actually have to plot all of them (and in many cases the output
 #' will be identical.)
 #' 
-#' This function will either take a set of indices or a value k (default 2000)
-#' and sample that many pvalues, then plot the log observed vs expected pvals
-#' in a nice way.
+#' This function will take a value k (default 2000) and sample that many
+#' pvalues, then plot the log observed vs expected pvals in a nice way.
+#' 
+#' Additional arguments are passed to plot().
 #' 
 #' @export
-thin.qqplot <- function(pvals, thin.idx=NULL, k=2000, ...) {
+fastqq <- function(pvals, k=2000, ...) {
   
-  n.genotypes <- length(pvals)
-  if ( missing(thin.idx) ) {
-    if ( is.null(k) ) {
-      thin.idx <- thin(n.genotypes)
-    } else {
-      thin.idx <- thin(n.genotypes, k)
-    }
-  }
+  np <- length(pvals)
+  thin.idx <- thin(np, k)
   
-  thin.logp.exp <- -log10(thin.idx/n.genotypes)
+  thin.logp.exp <- -log10(thin.idx/np)
   
-  thin.cint.95 <- sapply(thin.idx, function (x) { qbeta(0.95, x, n.genotypes - x + 1) })
-  thin.cint.05 <- sapply(thin.idx, function (x) { qbeta(0.05, x, n.genotypes - x + 1) })
+  thin.cint.95 <- sapply(thin.idx, function (x) { qbeta(0.95, x, np - x + 1) })
+  thin.cint.05 <- sapply(thin.idx, function (x) { qbeta(0.05, x, np - x + 1) })
   
   
   thin.logp.obs <- -log10(pvals[order(pvals)[thin.idx]])
@@ -66,4 +71,10 @@ thin.qqplot <- function(pvals, thin.idx=NULL, k=2000, ...) {
   abline(0, 1, col='gray', lty=2)
   lines(thin.logp.exp, -log10(thin.cint.95), lty=2, col='red')
   lines(thin.logp.exp, -log10(thin.cint.05), lty=2, col='red')
+}
+
+#' @export
+thin.qqplot <- function(pvals, thin.idx=NULL, k=2000, ...) {
+  warning('This function is deprecated, use fastqq')
+  fastqq(pvals, k, ...)
 }
