@@ -12,8 +12,8 @@
 #' x <- sort(runif(n))
 #' thin.idx <- thin(n, 500)
 #' par(mfcol=c(1, 2))
-#' plot(-log10(1:n), -log10(x), ann=FALSE)
-#' plot(-log10(thin.idx), -log10(x[thin.idx]), ann=FALSE)
+#' plot(-log10(1:n/n), -log10(x), ann=FALSE)
+#' plot(-log10(thin.idx/n), -log10(x[thin.idx]), ann=FALSE)
 #' 
 #' @export
 thin <- function(n, k=2000, max.idx=n) {
