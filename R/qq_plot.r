@@ -11,35 +11,25 @@ thin <- function(n, k=2000) {
     return (1:n)
   }
   
-  # Figure out how many groups we need to divide n into
-  # so that we end up with k values
-  # We want each group to be twice as big as the previous group
-  # We want to sample every index in the first group
-  x <- 2
-  while ( (2*x-2)/(2^x-2) > k/n ) { x <- x + 1 }
+  # Generate k samples x such that exp(n-x) is uniformly distributed
+  rx <- sort(log(runif(k)), decreasing=TRUE)
+  x <- round(n-(rx-min(rx))/(max(rx)-min(rx))*(n-1))
   
-  # Each group is twice as big as the previous group
-  end.idx <- c(round(2^(1:(x-1))*n/(2^x-2)), n)
-  start.idx <- c(1, end.idx[-x]+1)
+  # Ensure each x is unique (Equivalently, diff(x) != 0)
+  i <- 1
+  j <- 1
+  dx <- diff(x)
   
-  # Sample the same number of values from each group
-  sample.size <- ceiling(k/x)
-  thin.idx <- NULL
-  
-  for ( i in 1:x ) {
-    if ( end.idx[i] - start.idx[i] < sample.size) {
-      # If there aren't enough values use all indices in group i
-      thin.idx <- c(thin.idx, start.idx[i]:end.idx[i])
-      # Adjust sample size accordingly
-      sample.size <- ceiling((k-length(thin.idx))/(x-i))
-    } else {
-      # Sample from group i
-      thin.idx <- c(thin.idx, sort(sample(start.idx[i]:end.idx[i], sample.size)))
-    }
+  while ( any(dx[i:(k-1)] == 0) ) {
+    i <- i - 1 + which.max(dx[i:(k-1)] == 0)
+    if ( dx[j] <= 1 )
+      j <- j - 1 + which.max(dx[j:(k-1)] > 1)
+    
+    dx[i] <- dx[i] + 1
+    dx[j] <- dx[j] - 1
   }
   
-  # Return the list of indices
-  return ( thin.idx )
+  cumsum(c(1, dx))
 }
 
 #' Fast QQ plots
