@@ -1,5 +1,11 @@
 # This function samples k indices from 1:n starting with very dense sampling
 # (every value) and then getting more and more sparse
+
+#' Sampling for qq plots
+#' 
+#' Returns k indices between 1:n such that sampling is very dense at the start and much less dense at the end.
+#' 
+#' @export
 thin <- function(n, k=2000) {
   if ( n < k ) {
     return (1:n)
