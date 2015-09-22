@@ -63,12 +63,10 @@ fastqq <- function(pvals, k=2000, ...) {
   np <- length(pvals)
   thin.idx <- thin(np, k)
   
+  thin.cint.95 <- qbeta(0.95, thin.idx, np - thin.idx + 1)
+  thin.cint.05 <- qbeta(0.05, thin.idx, np - thin.idx + 1)
+  
   thin.logp.exp <- -log10(thin.idx/np)
-  
-  thin.cint.95 <- sapply(thin.idx, function (x) { qbeta(0.95, x, np - x + 1) })
-  thin.cint.05 <- sapply(thin.idx, function (x) { qbeta(0.05, x, np - x + 1) })
-  
-  
   thin.logp.obs <- -log10(pvals[order(pvals)[thin.idx]])
   
   plot(thin.logp.exp, thin.logp.obs, xlab=expression(-log[10](p[expected])), ylab=expression(-log[10](p[observed])), ...)
