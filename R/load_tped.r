@@ -9,7 +9,6 @@ load.tped <- function(prefix) {
   n.samples <- nrow(geno.samples)
   
   geno.data <- scan(tped.file, character())
-  
   n.snps <- length(geno.data)/(2*n.samples+4)
   
   dim(geno.data) <- c(2*n.samples+4, n.snps)

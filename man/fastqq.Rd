@@ -8,13 +8,17 @@ fastqq(pvals, k = 2000, ...)
 }
 \description{
 QQ plots with lots of points can be slow. Since most of the points overlap
-we don't actually have to plot all of them (and in many cases the output
+we don't actually have to plot all of them (and in most cases the output
 will be identical.)
 }
 \details{
 This function will take a value k (default 2000) and sample that many
-pvalues, then plot the log observed vs expected pvals in a nice way.
+pvalues in an intelligent way such that we don't lose information, then
+plot the log observed vs expected pvals in a nice way.
 
-Additional arguments are passed to plot().
+The optimal value of k depends on the resolution/size of the plot. Very high
+resolution or very large plots may need larger k to look correct.
+
+Additional arguments in ... are passed to plot().
 }
 

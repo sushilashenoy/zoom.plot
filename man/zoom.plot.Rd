@@ -5,8 +5,9 @@
 \title{Zoom in manhattan plot with gene models and LD plotted below.}
 \usage{
 zoom.plot(pvals, gene.id, all.snps, snp.id = NULL, genotypes,
-  window = 1e+06, min.snps = 10, color = "maf", img.height = 700,
-  img.width = 1200, img.prefix = "", save.image = TRUE)
+  window = 1e+06, min.snps = 10, color = "maf", ld.opts = NULL,
+  ld.colors = NULL, img.height = 700, img.width = 1200, img.prefix = "",
+  save.image = TRUE)
 }
 \arguments{
 \item{pvals}{a vector where each pval corresponds to a single SNP, ordered
@@ -35,6 +36,10 @@ versions but DOES NOT DO ANYTHING.}
 \item{color}{This can be \code{'maf'} if the manhattan plot should be colored by
 minor allele frequency or \code{'het'} to color by percent heterozygotes.
 Any other value will give black points.}
+
+\item{ld.opts}{list of optional arguments for ld.matrix}
+
+\item{ld.colors}{color scale for LD plot (default white->red)}
 
 \item{img.height}{height of saved image}
 

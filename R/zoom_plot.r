@@ -23,6 +23,8 @@
 #' @param color This can be \code{'maf'} if the manhattan plot should be colored by
 #' minor allele frequency or \code{'het'} to color by percent heterozygotes.
 #' Any other value will give black points.
+#' @param ld.opts list of optional arguments for ld.matrix
+#' @param ld.colors color scale for LD plot (default white->red)
 #' @param img.height height of saved image
 #' @param img.width width of saved image
 #' @param img.prefix Any additional image prefix desired, in addition to the
@@ -38,12 +40,14 @@
 #' 
 #' @export
 zoom.plot <- function(pvals, gene.id, all.snps, snp.id=NULL, genotypes,
-                      window=1e6, min.snps=10, color='maf',
+                      window=1e6, min.snps=10, color='maf', ld.opts=NULL, ld.colors=NULL,
                       img.height=700, img.width=1200, img.prefix="", save.image=TRUE) {
   # Colors for LD plot - ramp from white to red
-  ld.colors <- c(rgb(1, seq(1, 0.7, length.out=120), seq(1, 0.7, length.out=120)),
-                 rgb(1, seq(0.7, 0.4, length.out=41)[-1], seq(0.7, 0.4, length.out=41)[-1]),
-                 rgb(1, seq(0.4, 0, length.out=6)[-1], seq(0.4, 0, length.out=6)[-1]))
+  if ( is.null(ld.colors) ) {
+    ld.colors <- c(rgb(1, seq(1, 0.7, length.out=120), seq(1, 0.7, length.out=120)),
+                   rgb(1, seq(0.7, 0.4, length.out=41)[-1], seq(0.7, 0.4, length.out=41)[-1]),
+                   rgb(1, seq(0.4, 0, length.out=6)[-1], seq(0.4, 0, length.out=6)[-1]))
+  }
   # maf.colors <- c(rgb(65:0/65, 0, 0:65/65), rgb(0, 0, 32:0/32))
   maf.colors <- c(rgb(20:0/20, 0, 0), rgb(0, 1:20/20, 0))
   
@@ -62,9 +66,8 @@ zoom.plot <- function(pvals, gene.id, all.snps, snp.id=NULL, genotypes,
     cat('Centering around most significant SNP:', snp.id, '\n')
   }
   
-
-  snp.index <- which(all.snps$id==snp.id)
-  if ( snp.index == 0 ) {
+  snp.index <- match(snp.id, all.snps$id)
+  if ( is.na(snp.index) ) {
     stop('Could not find specified SNP!')
   }
   
@@ -121,7 +124,11 @@ zoom.plot <- function(pvals, gene.id, all.snps, snp.id=NULL, genotypes,
   }
   
   zoom.genes <- get.regional.genes(chromosome, snp.range[1], snp.range[2])
-  LDM <- ld.matrix(window.genotypes)
+  if ( is.null(ld.opts) ) {
+    LDM <- ld.matrix(window.genotypes)
+  } else {
+    LDM <- do.call(ld.matrix, c(list(genotypes=window.genotypes), ld.opts))
+  }
   
   
   if ( save.image ) {
@@ -134,7 +141,11 @@ zoom.plot <- function(pvals, gene.id, all.snps, snp.id=NULL, genotypes,
     png(filename=img.filename, height=img.height, width=img.width, bg="white", pointsize=24)
   }
   
-  layout(matrix(1:4, nrow=4), heights=c(4, 1, 1, 4))
+  if ( !is.null(nrow(zoom.genes)) ) {
+    layout(matrix(1:4, nrow=4), heights=c(4, 1, 1, 4))
+  } else {
+    layout(matrix(1:3, nrow=3), heights=c(4, 1, 4))
+  }
   par(mar=c(0.5, 4, 2, 0.5))
   
   plot(1, xlab='', ylab=expression(-log[10](p)),
@@ -155,9 +166,10 @@ zoom.plot <- function(pvals, gene.id, all.snps, snp.id=NULL, genotypes,
   
   par(mar=c(0, 4, 0, 0.5))
   draw.chrom.axis(snp.range[1], snp.range[2], paste('chr', chromosome))
+
   
   par(mar=c(0.5, 4, 1.5, 0.5))
-  ld.plot(LDM, snp.positions, snp.range[1], snp.range[2])
+  ld.plot(LDM, snp.positions, snp.range[1], snp.range[2], ld.colors=ld.colors)
   
   if ( save.image ) {
     dev.off()

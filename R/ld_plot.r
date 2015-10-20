@@ -7,8 +7,9 @@ complement <- function( marker ) {
   return ( 2 - marker )
 }
 
-# MLE method for calculating D'
-LD.D.prime.matrix <- function(X, mc.cores) {
+calc.ld.matrix <- function(X, mc.cores, ld.fun=linkage.disequilibrium.D.prime) {
+  
+  if ( is.null(ld.fun) ) ld.fun <- linkage.disequilibrium.D.prime
   
   if ( min(X, na.rm=TRUE) < 0 && max(X, na.rm=TRUE) < 2 ) {
     warn('Converting -1/0/1 coded genotypes to 0/1/2')
@@ -57,7 +58,7 @@ LD.D.prime.matrix <- function(X, mc.cores) {
       marker1 <- X[-exclude, a]
       marker2 <- X[-exclude, b]
     }
-    return ( linkage.disequilibrium.D.prime(marker1, marker2) )
+    return ( ld.fun(marker1, marker2) )
   }
   
   # use MC.CORES to calculate D' for every pair
@@ -89,6 +90,7 @@ log.L.linkage.disequilibrium <- function(pAB, p.A, p.B, counts) {
 
 # calculates D' much faster than the LD function in library(genetics)
 # code is adapted from library(genetics)
+#' @export
 linkage.disequilibrium.D.prime <- function(X1, X2) {
   
   if ( all(X1==X2) ) {
@@ -135,7 +137,7 @@ linkage.disequilibrium.D.prime <- function(X1, X2) {
                                 p.A=p.A, p.B=p.B, counts=counts),
                        error=function(e) { return ( NA ) })
   
-  if ( is.na(solution) ) {
+  if ( any(is.na(solution)) ) {
     return ( NA )
   }
   
@@ -153,7 +155,66 @@ linkage.disequilibrium.D.prime <- function(X1, X2) {
 }
 
 #' @export
-ld.matrix <- function(genotypes, mc.cores) {
+linkage.disequilibrium.r.squared <- function(X1, X2) {
+  if ( all(X1==X2) ) {
+    return ( 1 )
+  }
+  
+  p.A <- sum(X1) / (2*length(X1))
+  p.B <- sum(X2) / (2*length(X2))
+  
+  if ( p.A < 0.5 ) {
+    p.A <- 1 - p.A
+    X1 <- complement(X1)
+  }
+  
+  if ( p.B < 0.5 ) {
+    p.B <- 1 - p.B
+    X2 <- complement(X2)
+  }
+  
+  p.a <- 1 - p.A
+  p.b <- 1 - p.B
+  
+  # Make a contingency table for makers X1 and X2
+  N <- table(factor(X1, levels=0:2), factor(X2, levels=0:2))
+  
+  counts <- c()
+  counts[1] <- 2*N[1, 1] + N[1, 2] + N[2, 1] # p(ab)
+  counts[2] <- 2*N[1, 3] + N[1, 2] + N[2, 3] # p(aB)
+  counts[3] <- 2*N[3, 1] + N[2, 1] + N[3, 2] # p(Ab)
+  counts[4] <- 2*N[3, 3] + N[3, 2] + N[2, 3] # p(AB)
+  counts[5] <- N[2, 2] # p(AB)p(ab) + p(Ab)*p(aB)
+  
+  Dmin <- max(-p.A*p.B, -p.a*p.b)
+  Dmax <- min(p.A*p.b, p.B*p.a);
+  
+  pmin <- p.A*p.B + Dmin;
+  pmax <- p.A*p.B + Dmax;
+  
+  # Find p(AB) by maximizing log-likelihood function
+  solution <- tryCatch(optimize(log.L.linkage.disequilibrium,
+                                lower=pmin + .Machine$double.eps,
+                                upper=pmax - .Machine$double.eps,
+                                maximum=TRUE,
+                                p.A=p.A, p.B=p.B, counts=counts),
+                       error=function(e) { return ( NA ) })
+  
+  if ( any(is.na(solution)) ) {
+    return ( NA )
+  }
+  
+  pAB <- solution$maximum
+  
+  D <- pAB - p.A*p.B
+  
+  r.squared <- D^2 / (p.A * p.a * p.B * p.b)
+  
+  return ( r.squared )
+}
+
+#' @export
+ld.matrix <- function(genotypes, mc.cores, ld.fun=NULL, prune=FALSE, prune.window=50, prune.threshold=0.5, prune.ld.fun=NULL) {
   require('parallel')
   stopifnot(max(genotypes, na.rm=TRUE) <= 2,
             min(genotypes, na.rm=TRUE) >= 0)
@@ -161,8 +222,61 @@ ld.matrix <- function(genotypes, mc.cores) {
   if ( missing(mc.cores) ) {
     mc.cores <- detectCores()
   }
-  cat('Calculating LD for', ncol(genotypes), 'genotypes using', mc.cores, 'cores...\n')
-  LDM <- LD.D.prime.matrix(genotypes, mc.cores)
+  
+  if ( prune ) {
+    
+    cat('Pruning SNPs for LD matrix...\n')
+    if ( is.null(prune.ld.fun) )
+      prune.ld.fun <- linkage.disequilibrium.r.squared
+    window <- prune.window
+    threshold <- prune.threshold
+    
+    n.snps <- ncol(genotypes)
+    
+    get.ld.sibs <- function(i) {
+      min.idx <- max(1, i-window)
+      max.idx <- min(n.snps, i+window)
+      
+      up.pairs <- down.pairs <- NULL
+      if ( min.idx < i )
+        down.pairs <- data.frame(a=min.idx:(i-1), b=i)
+      if ( max.idx > i )
+        up.pairs <- data.frame(a=(i+1):max.idx, b=i)
+      
+      pairs <- rbind(down.pairs, up.pairs)
+      ld.vals <- sapply(1:nrow(pairs), function (x) with(pairs[x, , drop=FALSE],
+                                                         prune.ld.fun(genotypes[, a], genotypes[, b])))
+      pairs$a[ld.vals>threshold]
+    }
+    
+    all.ld.sibs <- mclapply(1:n.snps, get.ld.sibs, mc.cores=detectCores())
+    n.sibs <- sapply(all.ld.sibs, length)
+    
+    check.snps <- order(n.sibs, decreasing=TRUE)[1:sum(n.sibs>0)]
+    sub.snp <- 1:n.snps
+    sel.snp <- rep(0, n.snps)
+    
+    for ( i in check.snps ) {
+      if ( sel.snp[i] != 0 ) next
+      sel.snp[i] <- 1
+      sibs <- all.ld.sibs[[i]]
+      sib.sel <- sel.snp[sibs]
+      sibs <- sibs[sib.sel < 1]
+      sub.snp[sibs] <- i
+      sel.snp[sibs] <- -1
+    }
+    
+    selected <- which(sel.snp>=0)
+    sel.sub.snp <- match(sub.snp, selected)
+    
+    cat('Calculating LD for', length(selected), 'of', ncol(genotypes), 'genotypes using', mc.cores, 'cores...\n')
+    LDM.pruned <- calc.ld.matrix(genotypes[, selected], mc.cores, ld.fun=ld.fun)
+    LDM <- (LDM.pruned[, sel.sub.snp])[sel.sub.snp, ]
+    
+  } else {
+    cat('Calculating LD for', ncol(genotypes), 'genotypes using', mc.cores, 'cores...\n')
+    LDM <- calc.ld.matrix(genotypes, mc.cores, ld.fun=ld.fun)
+  }
   
   return ( LDM )
 }
