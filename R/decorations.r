@@ -431,3 +431,74 @@ mrange <- function(x, m=0.1) {
   
   return ( x )
 }
+
+
+#' Calculate offsets for plotting y ~ x where y is continuous and x is categorical
+#' 
+#' 
+#' @examples
+#' rx <- ceiling(runif(250, 0, 5))
+#' ry <- rnorm(250, 0, 100)+runif(5, 0, 2000)[rx]
+#' offset <- splitter(ry, rx)
+#' plot(offset+as.numeric(rx), ry, pch=20, col=rainbow(5)[rx])
+#' @export
+#' @export
+splitter <- function (y, x=NULL, rad=.025, scale=TRUE) {
+zx <- rep(0, length(y))
+if ( length(y) < 2 ) return (zx)
+
+if ( !is.null(x) ) {
+  if ( length(unique(x)) > length(x)/2 ) warning('x does not appear to be categorical')
+  
+  
+  if ( scale )
+    z <- (y-min(y))/diff(range(y))
+  
+  subs <- tapply(z, x, splitter, rad=rad, scale=FALSE, simplify=FALSE)
+  subidx <- tapply(1:length(y), x)
+  
+  for ( s in 1:length(subs) ) {
+    zx[subidx==s] <- subs[[s]]*length(subs)/2
+  }
+  return (zx)
+}
+
+y.order <- order(y)
+z <- y[y.order]
+if ( scale )
+  z <- (z-min(z))/diff(range(z))
+
+for  ( i in 2:length(z) ) {
+  
+  dz <- z[i]-z[1:(i-1)]
+  if ( any(dz < rad) ) {
+    nbs <- (1:(i-1))[dz < rad]
+    nbd <- sqrt((z[nbs]-z[i])^2+(zx[nbs]-zx[i])^2)
+    if ( any(nbd < rad) ) {
+      dz <- z[i]-z[nbs]
+      ax <- sin(acos(dz/rad))*rad*1.01
+      if ( mean(zx[nbs]) < 0 )
+        nbx <- zx[nbs]+ax
+      else
+        nbx <-  zx[nbs]-ax
+      
+      for ( j in order(abs(nbx)) ) {
+        zx[i] <- nbx[j]
+        nbd <- sqrt((z[nbs]-z[i])^2+(zx[nbs]-zx[i])^2)
+        if ( all(nbd >= rad) ) {
+          break
+        }
+      }
+      
+      if ( any(nbd < rad) )
+        cat('!')
+      
+    }
+    
+    
+    zx[1:i] <- zx[1:i]-mean(zx[1:i])
+  }
+}
+zx[y.order] <- zx
+return (zx)
+}
