@@ -4,7 +4,7 @@
 \alias{assign.scale.colors}
 \title{Assign colors to value according to a scale}
 \usage{
-assign.scale.colors(x, scale.colors, scale.range)
+assign.scale.colors(x, scale.colors, scale.range, all.inside = TRUE)
 }
 \arguments{
 \item{x}{values to be plotted}
@@ -12,6 +12,9 @@ assign.scale.colors(x, scale.colors, scale.range)
 \item{scale.colors}{a vector of colors}
 
 \item{scale.range}{range for scale (vector with 2 numeric elements)}
+
+\item{all.inside}{If TRUE, out-of-range points are colored with the ends of
+the color scale. If FALSE, they will be assigned no color (NA).}
 }
 \description{
 \code{draw.scale} takes a vector of values, a color vector, and a range

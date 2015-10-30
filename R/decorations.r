@@ -78,20 +78,24 @@ draw.chrom.axis <- function(start.pos, end.pos, chrom=NULL, label.chrom=TRUE,
 #' @param x values to be plotted
 #' @param scale.colors a vector of colors
 #' @param scale.range range for scale (vector with 2 numeric elements)
+#' @param all.inside If TRUE, out-of-range points are colored with the ends of
+#' the color scale. If FALSE, they will be assigned no color (NA). 
 #' @seealso \code{\link{draw.scale}} for drawing a color scale
 #' @export
-assign.scale.colors <- function(x, scale.colors, scale.range) {
+assign.scale.colors <- function(x, scale.colors, scale.range, all.inside=TRUE) {
   x.missing <- is.na(x)
   
   x[x.missing] <- mean(x, na.rm=TRUE)
   
   if ( missing(scale.range) ) scale.range <- range(x)
-  x.scaled <- (x-scale.range[1])/diff(scale.range)
-  color.idx <- 1+floor(x.scaled*(length(scale.colors)-1))
-  color.idx <- pmax(pmin(color.idx, length(scale.colors)), 1)
+  xbins <- seq(min(scale.range), max(scale.range), length.out=length(scale.colors)+1)
+  color.idx <- findInterval(x, xbins, rightmost.closed=TRUE, all.inside=all.inside)
+  if ( scale.range[1] > scale.range[2] )
+    color.idx <- 1+length(scale.colors)-color.idx
+  
   
   x.colors <- scale.colors[color.idx]
-  x.colors[x.missing] <- NA
+  x.colors[x.missing | color.idx == 0 | color.idx > length(scale.colors)] <- NA
   return ( x.colors )
 }
 

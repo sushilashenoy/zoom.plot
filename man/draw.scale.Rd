@@ -4,10 +4,10 @@
 \alias{draw.scale}
 \title{Draw a color scale bar}
 \usage{
-draw.scale(scale.colors, scale.range, num.labs = 6, pos = "topleft",
-  adj = NULL, horiz = TRUE, outside = FALSE, size = 2, ratio = 12,
-  tick.length = 0.25, scale.offset = 0.5, label.offset = 0.1,
-  box = TRUE, x.shift = 0, y.shift = 0)
+draw.scale(scale.colors, scale.range, num.labs = min(length(scale.colors) + 1,
+  6), pos = "topleft", adj = NULL, horiz = TRUE, outside = FALSE,
+  size = 2, ratio = 12, tick.length = 0.25, scale.offset = 0.5,
+  label.offset = 0.1, box = TRUE, x.shift = 0, y.shift = 0)
 }
 \arguments{
 \item{scale.colors}{a vector of colors}
