@@ -158,7 +158,7 @@ assign.scale.colors <- function(x, scale.colors, scale.range) {
 #' aligned with the left edge of the plot
 #' draw.scale(gray(0:4/5), c(1, 10), pos='topleft', adj=c(0, 0), outside=TRUE)
 #' @export
-draw.scale <- function(scale.colors, scale.range, num.labs=6,
+draw.scale <- function(scale.colors, scale.range, num.labs=min(length(scale.colors)+1, 6),
                        pos='topleft', adj=NULL, horiz=TRUE,
                        outside=FALSE, size=2, ratio=12, tick.length=0.25,
                        scale.offset=0.5, label.offset=0.1,
@@ -418,7 +418,7 @@ center.out.order <- function(n) {
 #' @export
 mrange <- function(x, m=0.1) {
   if ( length(x) < 2 ) {
-    cat('expected x with length of at least 2.\n')
+    warning('expected x with length of at least 2.\n')
     return ( x )
   }
   if ( length(x) > 2 ) {
