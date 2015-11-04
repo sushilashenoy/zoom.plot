@@ -75,6 +75,7 @@ load.gene.mart <- function(version='hg38',
                          'exon_chrom_start',
                          'exon_chrom_end')
   } else if ( version == 'BDGP5' ) {
+    BIOMART_OPTIONS$host <- 'dec2014.archive.ensembl.org'
     BIOMART_OPTIONS$dataset <- 'dmelanogaster_gene_ensembl'
     BIOMART_OPTIONS$filters <- NULL
     BIOMART_OPTIONS$filter.values <- NULL
