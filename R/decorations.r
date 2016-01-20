@@ -156,7 +156,7 @@ assign.scale.colors <- function(x, scale.colors, scale.range, all.inside=TRUE) {
 #' plot(1:5, 1:5, col=gray(0:4/5), pch=15)
 #' # Place a horizontal scale bar a the top, inside the plot.
 #' draw.scale(gray(0:4/5), c(0, 1), pos='top')
-#' # Place a vertical scale bar too the right, outside the plot.
+#' # Place a vertical scale bar to the right, outside the plot.
 #' draw.scale(gray(0:4/5), c(76.1, 76.92), pos='right', horiz=FALSE, outside=TRUE)
 #' # Place a horizontal  scale bar at the top left, outside the plot, but
 #' aligned with the left edge of the plot

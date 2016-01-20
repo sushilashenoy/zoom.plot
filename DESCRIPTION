@@ -7,5 +7,9 @@ Author: Sushila
 Maintainer: Sushila <sas2030@med.cornell.edu>
 Description: Modular zoom plots for genomic data
 License: None
-Suggests: biomaRt, parallel, compiler
+Suggests:
+    biomaRt,
+    parallel,
+    compiler
 LinksTo: stats
+RoxygenNote: 5.0.1
