@@ -26,20 +26,23 @@ thin <- function(n, k=2000, max.idx=n) {
   x <- round(max.idx*exp(-(k:1)/k*log(n)))
   
   # Ensure each x is unique (Equivalently, diff(x) != 0)
-  i <- 1
-  j <- 1
-  dx <- diff(x)
+  prev <- 0
+  offset <- 0
   
-  while ( any(dx[i:(k-1)] == 0) ) {
-    i <- i - 1 + which.max(dx[i:(k-1)] == 0)
-    if ( dx[j] <= 1 )
-      j <- j - 1 + which.max(dx[j:(k-1)] > 1)
-    
-    dx[i] <- dx[i] + 1
-    dx[j] <- dx[j] - 1
+  for ( i in 1:k ) {
+    if ( x[i] + offset == prev ) {
+      offset <- offset + 1
+    } else if ( x[i] + offset > prev + 1 && offset > 0 ) {
+      if ( x[i] > prev ) {
+        offset <- 0
+      } else {
+        offset <- prev + 1 - x[i]
+      }
+    }
+    prev <- x[i] <- x[i] + offset
   }
   
-  cumsum(c(1, dx))
+  x
 }
 
 #' Fast QQ plots
