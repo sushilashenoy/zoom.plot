@@ -421,8 +421,8 @@ center.out.order <- function(n) {
 #' 
 #' @export
 mrange <- function(x, m=0.1) {
-  if ( length(x) < 2 ) {
-    warning('expected x with length of at least 2.\n')
+  if ( length(x) < 2 || length(unique(x)) < 2 ) {
+    warning('expected x with at least 2 unique values.\n')
     return ( x )
   }
   if ( length(x) > 2 ) {
@@ -437,7 +437,7 @@ mrange <- function(x, m=0.1) {
 }
 
 
-#' Calculate offsets for plotting y ~ x where y is continuous and x is categorical
+#' Calculate offsets for plotting y ~ x scatter plots where y is continuous and x is categorical
 #' 
 #' 
 #' @examples
@@ -448,61 +448,61 @@ mrange <- function(x, m=0.1) {
 #' @export
 #' @export
 splitter <- function (y, x=NULL, rad=.025, scale=TRUE) {
-zx <- rep(0, length(y))
-if ( length(y) < 2 ) return (zx)
-
-if ( !is.null(x) ) {
-  if ( length(unique(x)) > length(x)/2 ) warning('x does not appear to be categorical')
+  zx <- rep(0, length(y))
+  if ( length(y) < 2 ) return (zx)
   
-  
-  if ( scale )
-    z <- (y-min(y))/diff(range(y))
-  
-  subs <- tapply(z, x, splitter, rad=rad, scale=FALSE, simplify=FALSE)
-  subidx <- tapply(1:length(y), x)
-  
-  for ( s in 1:length(subs) ) {
-    zx[subidx==s] <- subs[[s]]*length(subs)/2
+  if ( !is.null(x) ) {
+    if ( length(unique(x)) > length(x)/2 ) warning('x does not appear to be categorical')
+    
+    
+    if ( scale )
+      z <- (y-min(y))/diff(range(y))
+    
+    subs <- tapply(z, x, splitter, rad=rad, scale=FALSE, simplify=FALSE)
+    subidx <- tapply(1:length(y), x)
+    
+    for ( s in 1:length(subs) ) {
+      zx[subidx==s] <- subs[[s]]*length(subs)/2
+    }
+    return (zx)
   }
-  return (zx)
-}
-
-y.order <- order(y)
-z <- y[y.order]
-if ( scale )
-  z <- (z-min(z))/diff(range(z))
-
-for  ( i in 2:length(z) ) {
   
-  dz <- z[i]-z[1:(i-1)]
-  if ( any(dz < rad) ) {
-    nbs <- (1:(i-1))[dz < rad]
-    nbd <- sqrt((z[nbs]-z[i])^2+(zx[nbs]-zx[i])^2)
-    if ( any(nbd < rad) ) {
-      dz <- z[i]-z[nbs]
-      ax <- sin(acos(dz/rad))*rad*1.01
-      if ( mean(zx[nbs]) < 0 )
-        nbx <- zx[nbs]+ax
-      else
-        nbx <-  zx[nbs]-ax
-      
-      for ( j in order(abs(nbx)) ) {
-        zx[i] <- nbx[j]
-        nbd <- sqrt((z[nbs]-z[i])^2+(zx[nbs]-zx[i])^2)
-        if ( all(nbd >= rad) ) {
-          break
+  y.order <- order(y)
+  z <- y[y.order]
+  if ( scale )
+    z <- (z-min(z))/diff(range(z))
+  
+  for  ( i in 2:length(z) ) {
+    
+    dz <- z[i]-z[1:(i-1)]
+    if ( any(dz < rad) ) {
+      nbs <- (1:(i-1))[dz < rad]
+      nbd <- sqrt((z[nbs]-z[i])^2+(zx[nbs]-zx[i])^2)
+      if ( any(nbd < rad) ) {
+        dz <- z[i]-z[nbs]
+        ax <- sin(acos(dz/rad))*rad*1.01
+        if ( mean(zx[nbs]) < 0 )
+          nbx <- zx[nbs]+ax
+        else
+          nbx <-  zx[nbs]-ax
+        
+        for ( j in order(abs(nbx)) ) {
+          zx[i] <- nbx[j]
+          nbd <- sqrt((z[nbs]-z[i])^2+(zx[nbs]-zx[i])^2)
+          if ( all(nbd >= rad) ) {
+            break
+          }
         }
+        
+        if ( any(nbd < rad) )
+          cat('!')
+        
       }
       
-      if ( any(nbd < rad) )
-        cat('!')
       
+      zx[1:i] <- zx[1:i]-mean(zx[1:i])
     }
-    
-    
-    zx[1:i] <- zx[1:i]-mean(zx[1:i])
   }
-}
-zx[y.order] <- zx
-return (zx)
+  zx[y.order] <- zx
+  return (zx)
 }
