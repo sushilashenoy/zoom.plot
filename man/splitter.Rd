@@ -2,12 +2,12 @@
 % Please edit documentation in R/decorations.r
 \name{splitter}
 \alias{splitter}
-\title{Calculate offsets for plotting y ~ x where y is continuous and x is categorical}
+\title{Calculate offsets for plotting y ~ x scatter plots where y is continuous and x is categorical}
 \usage{
 splitter(y, x = NULL, rad = 0.025, scale = TRUE)
 }
 \description{
-Calculate offsets for plotting y ~ x where y is continuous and x is categorical
+Calculate offsets for plotting y ~ x scatter plots where y is continuous and x is categorical
 }
 \examples{
 rx <- ceiling(runif(250, 0, 5))
