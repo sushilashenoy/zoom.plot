@@ -651,12 +651,24 @@ gw.snp.pos <- function(chromosome, position, spacing=0.1) {
   
   chr.offsets <- chr.bounds[1:nrow(chr.ranges)] - chr.ranges[, 1]
   
-  gwpos <- chr.offsets[match(co, chr.names)] + po
+  gwpos <- unname(chr.offsets[match(co, chr.names)] + po)
+  gwpos[snp.order] <- gwpos
   
   attr(gwpos, 'chr.names') <- chr.names
   attr(gwpos, 'chr.bounds') <- chr.bounds
   
+  class(gwpos) <- 'gwpos'
+  
   return (gwpos)
+}
+
+#' @export
+`[.gwpos` <- function(x, i, ...) {
+  attrs <- attributes(x)
+  out <- unclass(x)
+  out <- out[i]
+  attributes(out) <- attrs
+  out
 }
 
 #' @export
@@ -667,12 +679,13 @@ gwaxis <- function(names, bounds) {
 }
 
 #' @export
-gwplot <- function (x, ...) {
-  if ( is.null(attr(x, 'chr.names')) || is.null(attr(x, 'chr.bounds')) ) {
-    warning('No gw.snp.pos attributes found.')
-    return ( plot(x, ...) )
-  }
-  plot(x, xaxt='n', ... )
-  gwaxis(attr(x, 'chr.names'), attr(x, 'chr.bounds'))
+plot.gwpos <- function (x, y=NULL, xlab=NULL, ylab=NULL, xaxt=NULL, ...) {
+  
+  if ( missing(xlab) ) xlab <- deparse(substitute(x))
+  if ( missing(ylab) ) ylab <- deparse(substitute(y))
+
+  plot.default(x, y, xlab=xlab, ylab=ylab, xaxt='n', ...)
+  if ( missing(xaxt) || xaxt != 'n')
+    gwaxis(attr(x, 'chr.names'), attr(x, 'chr.bounds'))
 }
 
