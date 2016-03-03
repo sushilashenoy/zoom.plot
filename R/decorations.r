@@ -653,8 +653,8 @@ gw.snp.pos <- function(chromosome, position, spacing=0.1) {
   
   gwpos <- chr.offsets[match(co, chr.names)] + po
   
-  attr(gwpos, 'names') <- chr.names
-  attr(gwpos, 'bounds') <- chr.bounds
+  attr(gwpos, 'chr.names') <- chr.names
+  attr(gwpos, 'chr.bounds') <- chr.bounds
   
   return (gwpos)
 }
@@ -668,11 +668,11 @@ gwaxis <- function(names, bounds) {
 
 #' @export
 gwplot <- function (x, ...) {
-  if ( is.null(attr(x, 'names')) || is.null(attr(x, 'bounds')) ) {
+  if ( is.null(attr(x, 'chr.names')) || is.null(attr(x, 'chr.bounds')) ) {
     warning('No gw.snp.pos attributes found.')
     return ( plot(x, ...) )
   }
   plot(x, xaxt='n', ... )
-  gwaxis(attr(x, 'names'), attr(x, 'bounds'))
+  gwaxis(attr(x, 'chr.names'), attr(x, 'chr.bounds'))
 }
 
