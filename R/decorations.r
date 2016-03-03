@@ -636,5 +636,43 @@ label.bins <- function(x, bins, greedy=TRUE) {
 
 
 
+#' @export
+gw.snp.pos <- function(chromosome, position, spacing=0.1) {
+  snp.order <- gtools::mixedorder(chromosome, position)
+  
+  co <- chromosome[snp.order]
+  po <- position[snp.order]
+  
+  chr.ranges <- do.call(rbind, tapply(po, co, range))
+  chr.names <- rownames(chr.ranges)
+  chr.sizes <- apply(chr.ranges, 1, diff)
+  space <- mean(chr.sizes)*spacing
+  chr.bounds <- unname(cumsum(c(0, chr.sizes+spacing)))
+  
+  chr.offsets <- chr.bounds[1:nrow(chr.ranges)] - chr.ranges[, 1]
+  
+  gwpos <- chr.offsets[match(co, chr.names)] + po
+  
+  attr(gwpos, 'names') <- chr.names
+  attr(gwpos, 'bounds') <- chr.bounds
+  
+  return (gwpos)
+}
 
+#' @export
+gwaxis <- function(names, bounds) {
+  midpts <- (bounds[-1] + bounds[-length(bounds)])/2
+  axis(1, bounds, labels=FALSE)
+  axis(1, midpts, labels=names, lwd=0)
+}
+
+#' @export
+gwplot <- function (x, ...) {
+  if ( is.null(attr(x, 'names')) || is.null(attr(x, 'bounds')) ) {
+    warning('No gw.snp.pos attributes found.')
+    return ( plot(x, ...) )
+  }
+  plot(x, xaxt='n', ... )
+  gwaxis(attr(x, 'names'), attr(x, 'bounds'))
+}
 
