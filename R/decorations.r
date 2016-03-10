@@ -638,23 +638,24 @@ label.bins <- function(x, bins, greedy=TRUE) {
 
 #' @export
 gw.snp.pos <- function(chromosome, position, spacing=0.1) {
-  snp.order <- gtools::mixedorder(chromosome, position)
+  chr.order <- gtools::mixedorder(unique(chromosome))
+  snp.order <- order(match(chromosome, chr.order), position)
   
-  co <- chromosome[snp.order]
+  co <- match(chromosome[snp.order], chr.order)
   po <- position[snp.order]
   
   chr.ranges <- do.call(rbind, tapply(po, co, range))
-  chr.names <- rownames(chr.ranges)
+  rownames(chr.ranges) <- chr.order
   chr.sizes <- apply(chr.ranges, 1, diff)
   space <- mean(chr.sizes)*spacing
   chr.bounds <- unname(cumsum(c(0, chr.sizes+spacing)))
   
   chr.offsets <- chr.bounds[1:nrow(chr.ranges)] - chr.ranges[, 1]
   
-  gwpos <- unname(chr.offsets[match(co, chr.names)] + po)
+  gwpos <- unname(chr.offsets[co] + po)
   gwpos[snp.order] <- gwpos
   
-  attr(gwpos, 'chr.names') <- chr.names
+  attr(gwpos, 'chr.names') <- chr.order
   attr(gwpos, 'chr.bounds') <- chr.bounds
   
   class(gwpos) <- 'gwpos'
@@ -683,9 +684,8 @@ plot.gwpos <- function (x, y=NULL, xlab=NULL, ylab=NULL, xaxt=NULL, ...) {
   
   if ( missing(xlab) ) xlab <- deparse(substitute(x))
   if ( missing(ylab) ) ylab <- deparse(substitute(y))
-
+  
   plot.default(x, y, xlab=xlab, ylab=ylab, xaxt='n', ...)
   if ( missing(xaxt) || xaxt != 'n')
     gwaxis(attr(x, 'chr.names'), attr(x, 'chr.bounds'))
 }
-
