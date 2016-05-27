@@ -638,7 +638,7 @@ label.bins <- function(x, bins, greedy=TRUE) {
 
 #' @export
 gw.snp.pos <- function(chromosome, position, spacing=0.1) {
-  chr.order <- gtools::mixedorder(unique(chromosome))
+  chr.order <- gtools::mixedsort(unique(chromosome))
   snp.order <- order(match(chromosome, chr.order), position)
   
   co <- match(chromosome[snp.order], chr.order)
@@ -673,10 +673,10 @@ gw.snp.pos <- function(chromosome, position, spacing=0.1) {
 }
 
 #' @export
-gwaxis <- function(names, bounds) {
+gwaxis <- function(names, bounds, ax=1) {
   midpts <- (bounds[-1] + bounds[-length(bounds)])/2
-  axis(1, bounds, labels=FALSE)
-  axis(1, midpts, labels=names, lwd=0)
+  axis(ax, bounds, labels=FALSE)
+  axis(ax, midpts, labels=names, lwd=0)
 }
 
 #' @export
