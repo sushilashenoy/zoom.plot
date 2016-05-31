@@ -15,9 +15,10 @@ rlcps <- function(x) {
 
 #' Find a minimal unique representation
 #' @export
-mur <- function(x, maintain.order=TRUE) {
+mur <- function(x, name.result=TRUE) {
   require('Biostrings')
   require('stringr')
+  orig.x <- x
   if ( any(duplicated(x))) stop('Duplicate values not allowed.')
   
   clean <-  stringr::str_replace_all(x, '[._\\s]', '')
@@ -49,27 +50,20 @@ mur <- function(x, maintain.order=TRUE) {
     }
   }
   
-  for ( j in 2:n ) {
-    i <- j-1
-    if ( mx[i] == mx[j] ) {
-      if ( nchar(sx[i]) > 0 ) {
-        mx[i] <- paste0(mx[i], substring(sx[i], 1, 1))
-        sx[i] <- substring(sx[i], 2)
-      }
-      if ( nchar(sx[j]) > 0 ) {
-        mx[j] <- paste0(mx[j], substring(sx[j], 1, 1))
-        sx[j] <- substring(sx[j], 2)
-      }
-    }
-    while ( maintain.order && xtfrm(c(mx[i], mx[j]))[1] != 1 && nchar(sx[j]) > 0 ) {
-      mx[j] <- paste0(mx[j], substring(sx[j], 1, 1))
-      sx[j] <- substring(sx[j], 2)
+  for ( i in 1:n ) {
+    if ( nchar(sx[i]) > 0 ) {
+      mx[i] <- paste0(mx[i], substring(sx[i], 1, 1))
+      sx[i] <- substring(sx[i], 2)
     }
   }
   
   result <- mx
   result[xo] <- mx
-  return (mx)
+  
+  if ( name.result )
+    names(result) <- orig.x
+  
+  return (result)
 }
 
 

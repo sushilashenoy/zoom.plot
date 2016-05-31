@@ -4,7 +4,7 @@
 \alias{mur}
 \title{Find a minimal unique representation}
 \usage{
-mur(x)
+mur(x, name.result = TRUE)
 }
 \description{
 Find a minimal unique representation
