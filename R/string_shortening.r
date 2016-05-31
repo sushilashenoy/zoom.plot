@@ -15,7 +15,7 @@ rlcps <- function(x) {
 
 #' Find a minimal unique representation
 #' @export
-mur <- function(x) {
+mur <- function(x, maintain.order=TRUE) {
   require('Biostrings')
   require('stringr')
   if ( any(duplicated(x))) stop('Duplicate values not allowed.')
@@ -60,6 +60,10 @@ mur <- function(x) {
         mx[j] <- paste0(mx[j], substring(sx[j], 1, 1))
         sx[j] <- substring(sx[j], 2)
       }
+    }
+    while ( maintain.order && xtfrm(c(mx[i], mx[j]))[1] != 1 && nchar(sx[j]) > 0 ) {
+      mx[j] <- paste0(mx[j], substring(sx[j], 1, 1))
+      sx[j] <- substring(sx[j], 2)
     }
   }
   
