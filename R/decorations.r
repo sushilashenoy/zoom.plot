@@ -298,6 +298,8 @@ draw.scale <- function(scale.colors, scale.range, num.labs=min(length(scale.colo
   if ( outside ) {
     par(old.par)
   }
+  
+  invisible(c(x1, x2, y1, y2))
 }
 
 
