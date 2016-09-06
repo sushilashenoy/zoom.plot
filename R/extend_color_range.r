@@ -56,3 +56,10 @@ darken.colors <- function(colors, pct) {
   
   return ( rgb(new.red, new.grn, new.blu) )
 }
+
+
+#' Display colors in a palette
+#' @export
+display.pal <- function(colors) {
+  image(matrix(1:length(colors), ncol=1), col=colors, ann=FALSE, xaxt='n', yaxt='n', bty='n')
+}
